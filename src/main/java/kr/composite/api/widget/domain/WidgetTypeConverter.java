@@ -7,11 +7,12 @@ import jakarta.persistence.Converter;
 public class WidgetTypeConverter implements AttributeConverter<WidgetType, String> {
 
     @Override
-    public String convertToDatabaseColumn(WidgetType attribute) {
-        if (attribute == null) {
+    public String convertToDatabaseColumn(WidgetType widgetType) {
+        if (widgetType == null) {
             return null;
         }
-        return attribute.getDescription();
+
+        return widgetType.getDescription();
     }
 
     @Override
@@ -19,6 +20,7 @@ public class WidgetTypeConverter implements AttributeConverter<WidgetType, Strin
         if (dbData == null) {
             return null;
         }
+
         return WidgetType.from(dbData);
     }
 }
