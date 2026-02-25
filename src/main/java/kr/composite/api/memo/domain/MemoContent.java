@@ -11,7 +11,7 @@ public class MemoContent {
     private static final int MIN_LENGTH = 1;
     private static final int MAX_LENGTH = 200;
 
-    @Column(name = "contents")
+    @Column(name = "content")
     private String value;
 
     public MemoContent(String value) {

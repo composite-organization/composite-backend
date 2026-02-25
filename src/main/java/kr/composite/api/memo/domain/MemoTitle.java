@@ -10,6 +10,7 @@ public class MemoTitle {
 
     private static final int MIN_LENGTH = 1;
     private static final int MAX_LENGTH = 50;
+
     @Column(name = "title")
     private String value;
 
