@@ -1,7 +1,8 @@
 package kr.composite.api.quiz.domain;
 
-import java.util.Arrays;
 import lombok.Getter;
+
+import java.util.Arrays;
 
 @Getter
 public enum QuizStatus {
@@ -10,8 +11,7 @@ public enum QuizStatus {
     IN_PROGRESS("진행 중"),
     ENDED("종료");
 
-
-    private String description;
+    private final String description;
 
     QuizStatus(String description) {
         this.description = description;
@@ -19,11 +19,8 @@ public enum QuizStatus {
 
     public static QuizStatus from(String description) {
         return Arrays.stream(values())
-                .filter(status ->
-                        status.description.equals(description)
-                )
+                .filter(value -> value.description.equals(description))
                 .findFirst()
-                .orElseThrow(IllegalArgumentException::new
-                );
+                .orElseThrow(IllegalArgumentException::new);
     }
 }

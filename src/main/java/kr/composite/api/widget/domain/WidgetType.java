@@ -20,7 +20,7 @@ public enum WidgetType {
 
     public static WidgetType from(String description) {
         return Arrays.stream(values())
-                .filter(status -> status.description.equals(description))
+                .filter(value -> value.description.equals(description))
                 .findFirst()
                 .orElseThrow(IllegalArgumentException::new);
     }
