@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Getter
 @SoftDelete
 @MappedSuperclass
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class BaseEntity {
