@@ -17,8 +17,10 @@ public class VoteOption extends BaseEntity {
     @Column(name = "vote_widget_id")
     private Long voteWidgetId;
 
+    @Column(name = "sequence")
     private Long sequence;
 
+    @Column(name = "content")
     private String content;
 
 }
