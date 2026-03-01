@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @MappedSuperclass
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class User extends BaseEntity {
 
