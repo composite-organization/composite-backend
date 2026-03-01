@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Attachment extends BaseEntity {
 
-    @Column(name = "link")
-    private String link;
+    @Column(name = "url")
+    private String url;
 
     @Embedded
     private AttachmentName attachmentName;
