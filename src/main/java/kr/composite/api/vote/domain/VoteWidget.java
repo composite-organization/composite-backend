@@ -24,7 +24,9 @@ public class VoteWidget extends BaseEntity {
     @Embedded
     private VoteDescription voteDescription;
 
+    @Column(name = "is_anonymous")
     private boolean isAnonymous;
 
+    @Column(name = "is_multi_selectable")
     private boolean isMultiSelectable;
 }
