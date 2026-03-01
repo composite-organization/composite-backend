@@ -1,5 +1,6 @@
 package kr.composite.api.attachment.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import kr.composite.api.global.domain.BaseEntity;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Attachment extends BaseEntity {
 
+    @Column(name = "link")
     private String link;
 
     @Embedded
