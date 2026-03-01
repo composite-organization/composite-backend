@@ -22,6 +22,7 @@ public class QuizWidget extends BaseEntity {
     @Embedded
     private QuizTitle title;
 
+    @Column(name = "status")
     @Convert(converter = QuizStatusConverter.class)
     private QuizStatus quizStatus;
 }
