@@ -1,6 +1,7 @@
 package kr.composite.api.attachment.domain;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import kr.composite.api.global.domain.BaseEntity;
@@ -15,6 +16,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Attachment extends BaseEntity {
 
+    @Column(name = "attachment_widget_id")
+    private Long attachmentWidgetId;
+
     @Column(name = "url")
     private String url;
 
@@ -23,4 +27,8 @@ public class Attachment extends BaseEntity {
 
     @Embedded
     private AttachmentSize attachmentSize;
+
+    @Column(name = "unit")
+    @Convert(converter = AttachmentUnit.Converter.class)
+    private AttachmentUnit unit;
 }
