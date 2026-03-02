@@ -19,6 +19,6 @@ public class Widget extends BaseEntity {
     private Long lessonId;
 
     @Column(name = "type")
-    @Convert(converter = WidgetTypeConverter.class)
+    @Convert(converter = WidgetType.WidgetTypeConverter.class)
     private WidgetType widgetType;
 }

@@ -23,6 +23,6 @@ public class QuizWidget extends BaseEntity {
     private QuizTitle title;
 
     @Column(name = "status")
-    @Convert(converter = QuizStatusConverter.class)
+    @Convert(converter = QuizStatus.QuizStatusConverter.class)
     private QuizStatus quizStatus;
 }

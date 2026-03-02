@@ -1,10 +1,10 @@
 package kr.composite.api.widget.domain;
 
-import lombok.Getter;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 
 import java.util.Arrays;
 
-@Getter
 public enum WidgetType {
 
     MEMO("MEMO"),
@@ -18,10 +18,28 @@ public enum WidgetType {
         this.description = description;
     }
 
-    public static WidgetType from(String description) {
-        return Arrays.stream(values())
-                .filter(value -> value.description.equals(description))
-                .findFirst()
-                .orElseThrow(IllegalArgumentException::new);
+    @Converter
+    public class WidgetTypeConverter implements AttributeConverter<WidgetType, String> {
+
+        @Override
+        public String convertToDatabaseColumn(WidgetType widgetType) {
+            if (widgetType == null) {
+                return null;
+            }
+
+            return widgetType.description;
+        }
+
+        @Override
+        public WidgetType convertToEntityAttribute(String dbData) {
+            if (dbData == null) {
+                return null;
+            }
+
+            return Arrays.stream(values())
+                    .filter(value -> value.description.equals(description))
+                    .findFirst()
+                    .orElseThrow(IllegalArgumentException::new);
+        }
     }
 }
