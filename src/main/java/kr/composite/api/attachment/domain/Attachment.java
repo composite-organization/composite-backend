@@ -29,6 +29,6 @@ public class Attachment extends BaseEntity {
     private AttachmentSize attachmentSize;
 
     @Column(name = "unit")
-    @Convert(converter = AttachmentUnit.Converter.class)
+    @Convert(converter = AttachmentUnit.AttachmentUnitConverter.class)
     private AttachmentUnit unit;
 }

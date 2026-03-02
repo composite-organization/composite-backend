@@ -1,6 +1,7 @@
 package kr.composite.api.attachment.domain;
 
 import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 
 import java.util.Arrays;
 
@@ -14,7 +15,8 @@ public enum AttachmentUnit {
         this.description = description;
     }
 
-    static class Converter implements AttributeConverter<AttachmentUnit, String> {
+    @Converter
+    static class AttachmentUnitConverter implements AttributeConverter<AttachmentUnit, String> {
 
         @Override
         public String convertToDatabaseColumn(AttachmentUnit attachmentUnit) {
