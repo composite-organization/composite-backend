@@ -17,9 +17,6 @@ public class QuizOption extends BaseEntity {
     @Column(name = "quiz_widget_id")
     private Long quizWidgetId;
 
-    @Column(name = "sequence")
-    private Long sequence;
-
     @Column(name = "content")
     private String content;
 
