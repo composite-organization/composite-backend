@@ -1,0 +1,31 @@
+package kr.composite.api.quiz.domain;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@Embeddable
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class QuizTitle {
+
+    private static final int MIN_LENGTH = 1;
+    private static final int MAX_LENGTH = 200;
+
+    @Column(name = "title")
+    private String value;
+
+    public QuizTitle(String value) {
+        validateValue(value);
+        this.value = value;
+    }
+
+    private void validateValue(String value) {
+        if (value == null) {
+            throw new IllegalArgumentException();
+        }
+        if (value.length() < MIN_LENGTH || value.length() > MAX_LENGTH) {
+            throw new IllegalArgumentException();
+        }
+    }
+}
