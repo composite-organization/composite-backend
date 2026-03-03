@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class Student extends Participant {
 
-    public Student(Long lessonId) {
-        super(lessonId);
+    public Student(Long lessonId, ParticipantName participantName) {
+        super(lessonId, participantName);
     }
 }
