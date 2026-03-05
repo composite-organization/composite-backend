@@ -16,7 +16,7 @@ public enum AttachmentUnit {
     }
 
     @Converter
-    static class AttachmentUnitConverter implements AttributeConverter<AttachmentUnit, String> {
+    public static class AttachmentUnitConverter implements AttributeConverter<AttachmentUnit, String> {
 
         @Override
         public String convertToDatabaseColumn(AttachmentUnit attachmentUnit) {

@@ -18,7 +18,7 @@ public enum QuizStatus {
     }
 
     @Converter
-    public class QuizStatusConverter implements AttributeConverter<QuizStatus, String> {
+    public static class QuizStatusConverter implements AttributeConverter<QuizStatus, String> {
 
         @Override
         public String convertToDatabaseColumn(QuizStatus quizStatus) {
@@ -36,7 +36,7 @@ public enum QuizStatus {
             }
 
             return Arrays.stream(values())
-                    .filter(value -> value.description.equals(description))
+                    .filter(value -> value.description.equals(dbData))
                     .findFirst()
                     .orElseThrow(IllegalArgumentException::new);
         }

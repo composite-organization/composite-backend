@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 public class AttachmentSize {
 
     @Column(name = "size")
-    private String value;
+    private int value;
 
-    public AttachmentSize(String value) {
+    public AttachmentSize(int value) {
         this.value = value;
     }
 }

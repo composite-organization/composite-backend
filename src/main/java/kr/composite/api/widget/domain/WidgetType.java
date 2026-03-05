@@ -2,7 +2,6 @@ package kr.composite.api.widget.domain;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-
 import java.util.Arrays;
 
 public enum WidgetType {
@@ -19,7 +18,7 @@ public enum WidgetType {
     }
 
     @Converter
-    public class WidgetTypeConverter implements AttributeConverter<WidgetType, String> {
+    public static class WidgetTypeConverter implements AttributeConverter<WidgetType, String> {
 
         @Override
         public String convertToDatabaseColumn(WidgetType widgetType) {
@@ -37,7 +36,7 @@ public enum WidgetType {
             }
 
             return Arrays.stream(values())
-                    .filter(value -> value.description.equals(description))
+                    .filter(value -> value.description.equals(dbData))
                     .findFirst()
                     .orElseThrow(IllegalArgumentException::new);
         }
