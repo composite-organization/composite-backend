@@ -2,9 +2,6 @@ spring:
   config:
     import: optional:file:.env[.properties]
 
-  application:
-    name: composite
-
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${DB_URL}
@@ -13,8 +10,6 @@ spring:
 
   flyway:
     enabled: ${FLYWAY_ENABLED}
-    locations: ${FLYWAY_LOCATIONS}
-    baseline-on-migrate: ${FLYWAY_BASELINE_ON_MIGRATE}
 
   jpa:
     hibernate:
@@ -22,3 +17,4 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
