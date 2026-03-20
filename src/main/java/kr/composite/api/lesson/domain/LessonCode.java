@@ -17,11 +17,8 @@ public class LessonCode {
     }
 
     private void validateValue(String value) {
-        if (value == null) {
-            throw new IllegalArgumentException();
-        }
-        if (value.isEmpty()) {
-            throw new IllegalArgumentException();
+        if (value == null || value.isBlank()) {
+            throw LessonDomainException.emptyCode(value);
         }
     }
 }
