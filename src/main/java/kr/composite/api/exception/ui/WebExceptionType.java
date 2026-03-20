@@ -1,4 +1,4 @@
-package kr.composite.exception.ui;
+package kr.composite.api.exception.ui;
 
 import java.util.Arrays;
 import java.util.Map;

@@ -1,6 +1,6 @@
 package kr.composite.api.attachment.domain;
 
-import kr.composite.exception.domain.BusinessException;
+import kr.composite.api.exception.domain.BusinessException;
 
 public class AttachmentDomainException extends BusinessException {
 

@@ -1,4 +1,4 @@
-package kr.composite.exception.domain;
+package kr.composite.api.exception.domain;
 
 import lombok.Getter;
 

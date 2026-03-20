@@ -1,7 +1,7 @@
-package kr.composite.exception.ui;
+package kr.composite.api.exception.ui;
 
-import kr.composite.exception.domain.BusinessException;
-import kr.composite.exception.ui.dto.response.ErrorResponse;
+import kr.composite.api.exception.domain.BusinessException;
+import kr.composite.api.exception.ui.dto.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

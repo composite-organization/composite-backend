@@ -1,7 +1,7 @@
-package kr.composite.exception.ui.dto.response;
+package kr.composite.api.exception.ui.dto.response;
 
-import kr.composite.exception.domain.BusinessException;
-import kr.composite.exception.ui.WebExceptionType;
+import kr.composite.api.exception.domain.BusinessException;
+import kr.composite.api.exception.ui.WebExceptionType;
 import org.springframework.http.HttpStatus;
 
 public record ErrorResponse(

@@ -1,6 +1,6 @@
 package kr.composite.api.lesson.domain;
 
-import kr.composite.exception.domain.BusinessException;
+import kr.composite.api.exception.domain.BusinessException;
 
 public class LessonDomainException extends BusinessException {
 
