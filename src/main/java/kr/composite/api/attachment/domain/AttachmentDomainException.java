@@ -2,7 +2,7 @@ package kr.composite.api.attachment.domain;
 
 import kr.composite.api.exception.domain.BusinessException;
 
-public class AttachmentDomainException extends BusinessException {
+class AttachmentDomainException extends BusinessException {
 
     private static final String CODE_PREFIX = "ATTACHMENT_DOMAIN_";
 
@@ -14,7 +14,7 @@ public class AttachmentDomainException extends BusinessException {
         super(code, message, detail, category);
     }
 
-    public static AttachmentDomainException emptyName() {
+    static AttachmentDomainException emptyName() {
         return new AttachmentDomainException(
                 generateCode(1),
                 "첨부파일 이름이 비어있습니다.",
@@ -22,7 +22,7 @@ public class AttachmentDomainException extends BusinessException {
         );
     }
 
-    public static AttachmentDomainException invalidNameLength(String name, int minLength) {
+    static AttachmentDomainException invalidNameLength(String name, int minLength) {
         return new AttachmentDomainException(
                 generateCode(2),
                 "첨부파일 이름의 길이가 유효하지 않습니다. (최소 " + minLength + "자 이상)",
@@ -31,7 +31,7 @@ public class AttachmentDomainException extends BusinessException {
         );
     }
 
-    public static AttachmentDomainException invalidUnitDescription(String description) {
+    static AttachmentDomainException invalidUnitDescription(String description) {
         return new AttachmentDomainException(
                 generateCode(3),
                 "첨부파일 단위가 유효하지 않습니다.",
