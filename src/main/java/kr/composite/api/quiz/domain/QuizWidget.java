@@ -5,6 +5,7 @@ import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import kr.composite.api.global.domain.BaseEntity;
+import kr.composite.api.quiz.infrastructure.QuizStatusConverter;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,6 +24,6 @@ public class QuizWidget extends BaseEntity {
     private QuizTitle title;
 
     @Column(name = "status")
-    @Convert(converter = QuizStatus.QuizStatusConverter.class)
+    @Convert(converter = QuizStatusConverter.class)
     private QuizStatus quizStatus;
 }
