@@ -20,11 +20,11 @@ public class AttachmentName {
     }
 
     private void validateValue(String value) {
-        if (value == null) {
-            throw new IllegalArgumentException();
+        if (value == null || value.isEmpty()) {
+            throw AttachmentDomainException.emptyName();
         }
         if (value.length() < MIN_LENGTH) {
-            throw new IllegalArgumentException();
+            throw AttachmentDomainException.invalidNameLength(value, MIN_LENGTH);
         }
     }
 }
