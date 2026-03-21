@@ -1,5 +1,6 @@
 package kr.composite.api.memo.ui;
 
+import jakarta.validation.Valid;
 import java.net.URI;
 import kr.composite.api.memo.application.MemoWidgetService;
 import kr.composite.api.memo.application.dto.request.MemoWidgetIdRequest;
@@ -35,7 +36,8 @@ public class MemoWidgetController implements MemoWidgetApiSpec {
     }
 
     @PostMapping("memoWidgets")
-    public ResponseEntity<CreateMemoWidgetResponse> createMemoWidget(@RequestBody PostMemoWidgetRequest request) {
+    public ResponseEntity<CreateMemoWidgetResponse> createMemoWidget(
+            @Valid @RequestBody PostMemoWidgetRequest request) {
         CreateMemoWidgetResponse createMemoWidgetResponse = CreateMemoWidgetResponse.from(
                 memoWidgetService.addMemoWidget(request.toMemoWidgetAddRequest()));
 
@@ -46,7 +48,7 @@ public class MemoWidgetController implements MemoWidgetApiSpec {
     @PutMapping("memoWidgets/{memoWidgetId}")
     public ResponseEntity<UpdateMemoWidgetResponse> updateMemoWidget(
             @PathVariable("memoWidgetId") Long memoWidgetId,
-            @RequestBody UpdateMemoWidgetRequest request
+            @Valid @RequestBody UpdateMemoWidgetRequest request
     ) {
         UpdateMemoWidgetResponse updateMemoWidgetResponse = UpdateMemoWidgetResponse.from(
                 memoWidgetService.updateMemoWidget(request.toMemoWidgetUpdateRequest(memoWidgetId))
