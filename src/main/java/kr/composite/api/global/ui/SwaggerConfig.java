@@ -1,4 +1,4 @@
-package kr.composite.api.global.config;
+package kr.composite.api.global.ui;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
