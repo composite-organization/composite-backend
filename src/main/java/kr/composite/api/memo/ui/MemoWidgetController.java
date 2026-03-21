@@ -27,7 +27,7 @@ public class MemoWidgetController implements MemoWidgetApiSpec {
 
     @GetMapping("memoWidgets/{memoWidgetId}")
     public ResponseEntity<GetMemoWidgetResponse> readMemoWidget(@PathVariable("memoWidgetId") Long memoWidgetId) {
-        MemoWidgetIdRequest memoWidgetIdRequest = MemoWidgetIdRequest.of(memoWidgetId);
+        MemoWidgetIdRequest memoWidgetIdRequest = MemoWidgetIdRequest.from(memoWidgetId);
         GetMemoWidgetResponse getMemoWidgetResponse = GetMemoWidgetResponse.from(
                 memoWidgetService.getMemoWidget(memoWidgetIdRequest));
 
@@ -57,7 +57,7 @@ public class MemoWidgetController implements MemoWidgetApiSpec {
 
     @DeleteMapping("memoWidgets/{memoWidgetId}")
     public ResponseEntity<Void> deleteMemoWidget(@PathVariable("memoWidgetId") Long memoWidgetId) {
-        MemoWidgetIdRequest memoWidgetIdRequest = MemoWidgetIdRequest.of(memoWidgetId);
+        MemoWidgetIdRequest memoWidgetIdRequest = MemoWidgetIdRequest.from(memoWidgetId);
         memoWidgetService.deleteMemoWidget(memoWidgetIdRequest);
 
         return ResponseEntity.noContent().build();

@@ -46,7 +46,7 @@ class MemoWidgetServiceTest {
         testEntityManager.clear();
 
         // when
-        MemoWidgetIdRequest memoWidgetIdRequest = MemoWidgetIdRequest.of(1L);
+        MemoWidgetIdRequest memoWidgetIdRequest = MemoWidgetIdRequest.from(1L);
         MemoWidgetResponse memoWidgetResponse = memoWidgetService.getMemoWidget(memoWidgetIdRequest);
 
         // then
@@ -59,7 +59,7 @@ class MemoWidgetServiceTest {
     @Test
     void 존재하지_않는_메모를_조회시_예외가_발생한다() {
         // given
-        MemoWidgetIdRequest memoWidgetIdRequest = MemoWidgetIdRequest.of(1L);
+        MemoWidgetIdRequest memoWidgetIdRequest = MemoWidgetIdRequest.from(1L);
         // when & then
         assertThatThrownBy(() -> memoWidgetService.getMemoWidget(memoWidgetIdRequest)).isInstanceOf(
                 IllegalArgumentException.class);
@@ -127,7 +127,7 @@ class MemoWidgetServiceTest {
         testEntityManager.flush();
         testEntityManager.clear();
 
-        MemoWidgetIdRequest memoWidgetIdRequest = MemoWidgetIdRequest.of(id);
+        MemoWidgetIdRequest memoWidgetIdRequest = MemoWidgetIdRequest.from(id);
 
         // when
         memoWidgetService.deleteMemoWidget(memoWidgetIdRequest);
