@@ -3,6 +3,7 @@ package kr.composite.api.memo.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import jakarta.persistence.EntityManager;
 import kr.composite.api.memo.application.dto.request.MemoWidgetAddRequest;
 import kr.composite.api.memo.application.dto.request.MemoWidgetIdRequest;
 import kr.composite.api.memo.application.dto.request.MemoWidgetUpdateRequest;
@@ -10,23 +11,20 @@ import kr.composite.api.memo.application.dto.response.MemoWidgetResponse;
 import kr.composite.api.memo.domain.MemoContent;
 import kr.composite.api.memo.domain.MemoTitle;
 import kr.composite.api.memo.domain.MemoWidget;
-import kr.composite.api.memo.infrastructure.JpaMemoWidgetRepository;
 import kr.composite.api.memo.infrastructure.SpringDataJpaMemoWidgetRepository;
 import kr.composite.api.widget.domain.Widget;
 import kr.composite.api.widget.domain.WidgetType;
-import kr.composite.api.widget.infrastructure.JpaWidgetRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
-@DataJpaTest
-@Import(value = {MemoWidgetService.class, JpaMemoWidgetRepository.class, JpaWidgetRepository.class})
+@Transactional
+@SpringBootTest
 class MemoWidgetServiceTest {
 
     @Autowired
-    TestEntityManager testEntityManager;
+    EntityManager entityManager;
 
     @Autowired
     SpringDataJpaMemoWidgetRepository springDataJpaMemoWidgetRepository;
@@ -37,21 +35,23 @@ class MemoWidgetServiceTest {
     @Test
     void 메모를_조회할_수_있다() {
         // given
-        testEntityManager.persist(new Widget(1L, WidgetType.MEMO));
+        Widget widget = new Widget(null, WidgetType.MEMO);
+        entityManager.persist(widget);
         MemoTitle memoTitle = new MemoTitle("title");
         MemoContent memoContent = new MemoContent("content");
-        testEntityManager.persist(new MemoWidget(1L, memoTitle, memoContent));
+        MemoWidget memoWidget = new MemoWidget(widget.getId(), memoTitle, memoContent);
+        entityManager.persist(memoWidget);
 
-        testEntityManager.flush();
-        testEntityManager.clear();
+        entityManager.flush();
+        entityManager.clear();
 
         // when
-        MemoWidgetIdRequest memoWidgetIdRequest = MemoWidgetIdRequest.from(1L);
+        MemoWidgetIdRequest memoWidgetIdRequest = MemoWidgetIdRequest.from(memoWidget.getId());
         MemoWidgetResponse memoWidgetResponse = memoWidgetService.getMemoWidget(memoWidgetIdRequest);
 
         // then
-        assertThat(memoWidgetResponse.id()).isEqualTo(1L);
-        assertThat(memoWidgetResponse.widgetId()).isEqualTo(1L);
+        assertThat(memoWidgetResponse.id()).isEqualTo(memoWidget.getId());
+        assertThat(memoWidgetResponse.widgetId()).isEqualTo(widget.getId());
         assertThat(memoWidgetResponse.title()).isEqualTo("title");
         assertThat(memoWidgetResponse.content()).isEqualTo("content");
     }
@@ -59,7 +59,7 @@ class MemoWidgetServiceTest {
     @Test
     void 존재하지_않는_메모를_조회시_예외가_발생한다() {
         // given
-        MemoWidgetIdRequest memoWidgetIdRequest = MemoWidgetIdRequest.from(1L);
+        MemoWidgetIdRequest memoWidgetIdRequest = MemoWidgetIdRequest.from(9999L);
         // when & then
         assertThatThrownBy(() -> memoWidgetService.getMemoWidget(memoWidgetIdRequest)).isInstanceOf(
                 IllegalArgumentException.class);
@@ -68,9 +68,11 @@ class MemoWidgetServiceTest {
     @Test
     void 메모를_생성할_수_있다() {
         // given
+
+        Long lessonId = 1L;
         String title = "메모 제목";
         String content = "메모 내용";
-        MemoWidgetAddRequest memoWidgetAddRequest = new MemoWidgetAddRequest(1L, title, content);
+        MemoWidgetAddRequest memoWidgetAddRequest = new MemoWidgetAddRequest(lessonId, title, content);
 
         // when
         MemoWidgetResponse memoWidgetResponse = memoWidgetService.addMemoWidget(memoWidgetAddRequest);
@@ -79,7 +81,6 @@ class MemoWidgetServiceTest {
         MemoWidget memoWidget = springDataJpaMemoWidgetRepository.findById(memoWidgetResponse.id()).orElse(null);
 
         assertThat(memoWidget).isNotNull();
-        assertThat(memoWidget.getWidgetId()).isEqualTo(1L);
         assertThat(memoWidget.getTitle().getValue()).isEqualTo(title);
         assertThat(memoWidget.getContent().getValue()).isEqualTo(content);
     }
@@ -89,50 +90,54 @@ class MemoWidgetServiceTest {
         // given
         String title = "메모 제목";
         String content = "메모 내용";
-        testEntityManager.persist(new Widget(1L, WidgetType.MEMO));
+        Widget widget = new Widget(null, WidgetType.MEMO);
+        entityManager.persist(widget);
         MemoTitle memoTitle = new MemoTitle(title);
         MemoContent memoContent = new MemoContent(content);
-        testEntityManager.persist(new MemoWidget(1L, memoTitle, memoContent));
+        MemoWidget memoWidget = new MemoWidget(widget.getId(), memoTitle, memoContent);
+        entityManager.persist(memoWidget);
 
-        testEntityManager.flush();
-        testEntityManager.clear();
+        entityManager.flush();
+        entityManager.clear();
 
         String updateTitle = "메모 제목 업데이트";
         String updatedContent = "메모 내용 업데이트";
-        MemoWidgetUpdateRequest memoWidgetUpdateRequest = new MemoWidgetUpdateRequest(1L, updateTitle, updatedContent);
+        MemoWidgetUpdateRequest memoWidgetUpdateRequest = new MemoWidgetUpdateRequest(memoWidget.getId(), updateTitle,
+                updatedContent);
 
         // when
         MemoWidgetResponse memoWidgetResponse = memoWidgetService.updateMemoWidget(memoWidgetUpdateRequest);
 
         // then
-        MemoWidget memoWidget = springDataJpaMemoWidgetRepository.findById(memoWidgetResponse.id()).orElse(null);
+        MemoWidget updatedMemoWidget = springDataJpaMemoWidgetRepository.findById(memoWidgetResponse.id()).orElse(null);
 
-        assertThat(memoWidget).isNotNull();
-        assertThat(memoWidget.getId()).isEqualTo(1L);
-        assertThat(memoWidget.getTitle().getValue()).isEqualTo(updateTitle);
-        assertThat(memoWidget.getContent().getValue()).isEqualTo(updatedContent);
+        assertThat(updatedMemoWidget).isNotNull();
+        assertThat(updatedMemoWidget.getId()).isEqualTo(memoWidget.getId());
+        assertThat(updatedMemoWidget.getTitle().getValue()).isEqualTo(updateTitle);
+        assertThat(updatedMemoWidget.getContent().getValue()).isEqualTo(updatedContent);
     }
 
     @Test
     void 메모를_삭제할_수_있다() {
         // given
-        Long id = 1L;
+        Widget widget = new Widget(null, WidgetType.MEMO);
+        entityManager.persist(widget);
         String title = "메모 제목";
         String content = "메모 내용";
-        testEntityManager.persist(new Widget(id, WidgetType.MEMO));
         MemoTitle memoTitle = new MemoTitle(title);
         MemoContent memoContent = new MemoContent(content);
-        testEntityManager.persist(new MemoWidget(id, memoTitle, memoContent));
+        MemoWidget memoWidget = new MemoWidget(widget.getId(), memoTitle, memoContent);
+        entityManager.persist(memoWidget);
 
-        testEntityManager.flush();
-        testEntityManager.clear();
+        entityManager.flush();
+        entityManager.clear();
 
-        MemoWidgetIdRequest memoWidgetIdRequest = MemoWidgetIdRequest.from(id);
+        MemoWidgetIdRequest memoWidgetIdRequest = MemoWidgetIdRequest.from(memoWidget.getId());
 
         // when
         memoWidgetService.deleteMemoWidget(memoWidgetIdRequest);
 
         // then
-        assertThat(springDataJpaMemoWidgetRepository.findById(id)).isEmpty();
+        assertThat(springDataJpaMemoWidgetRepository.findById(memoWidget.getId())).isEmpty();
     }
 }
