@@ -45,7 +45,7 @@ public class MemoWidgetController implements MemoWidgetApiSpec {
 
     @PutMapping("memoWidgets/{memoWidgetId}")
     public ResponseEntity<UpdateMemoWidgetResponse> updateMemoWidget(
-            @PathVariable Long memoWidgetId,
+            @PathVariable("memoWidgetId") Long memoWidgetId,
             @RequestBody UpdateMemoWidgetRequest request
     ) {
         UpdateMemoWidgetResponse updateMemoWidgetResponse = UpdateMemoWidgetResponse.from(
