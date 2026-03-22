@@ -2,13 +2,14 @@ package kr.composite.api.memo.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @Embeddable
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class MemoTitle {
 
-    private static final int MIN_LENGTH = 1;
     private static final int MAX_LENGTH = 50;
 
     @Column(name = "title")
@@ -23,7 +24,7 @@ public class MemoTitle {
         if (value == null) {
             throw new IllegalArgumentException();
         }
-        if (value.length() < MIN_LENGTH || value.length() > MAX_LENGTH) {
+        if (value.length() > MAX_LENGTH) {
             throw new IllegalArgumentException();
         }
     }
