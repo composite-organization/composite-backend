@@ -1,7 +1,7 @@
 package kr.composite.api.memo.application;
 
 import kr.composite.api.memo.application.dto.request.MemoWidgetAddRequest;
-import kr.composite.api.memo.application.dto.request.MemoWidgetIdRequest;
+import kr.composite.api.memo.application.dto.request.MemoWidgetFindRequest;
 import kr.composite.api.memo.application.dto.request.MemoWidgetUpdateRequest;
 import kr.composite.api.memo.application.dto.response.MemoWidgetResponse;
 import kr.composite.api.memo.domain.MemoContent;
@@ -23,7 +23,7 @@ public class MemoWidgetService {
     private final WidgetRepository widgetRepository;
 
     @Transactional(readOnly = true)
-    public MemoWidgetResponse getMemoWidget(MemoWidgetIdRequest request) {
+    public MemoWidgetResponse getMemoWidget(MemoWidgetFindRequest request) {
         MemoWidget memoWidget = memoWidgetRepository.findById(request.id())
                 .orElseThrow(() -> new IllegalArgumentException());
 
@@ -58,7 +58,7 @@ public class MemoWidgetService {
     }
 
     @Transactional
-    public void deleteMemoWidget(MemoWidgetIdRequest request) {
+    public void deleteMemoWidget(MemoWidgetFindRequest request) {
         MemoWidget memoWidget = memoWidgetRepository.findById(request.id()).orElse(null);
         if (memoWidget == null) {
             return;

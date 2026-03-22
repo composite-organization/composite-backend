@@ -3,7 +3,7 @@ package kr.composite.api.memo.ui;
 import jakarta.validation.Valid;
 import java.net.URI;
 import kr.composite.api.memo.application.MemoWidgetService;
-import kr.composite.api.memo.application.dto.request.MemoWidgetIdRequest;
+import kr.composite.api.memo.application.dto.request.MemoWidgetFindRequest;
 import kr.composite.api.memo.ui.apiSpec.MemoWidgetApiSpec;
 import kr.composite.api.memo.ui.dto.request.PostMemoWidgetRequest;
 import kr.composite.api.memo.ui.dto.request.UpdateMemoWidgetRequest;
@@ -28,9 +28,9 @@ public class MemoWidgetController implements MemoWidgetApiSpec {
 
     @GetMapping("memoWidgets/{memoWidgetId}")
     public ResponseEntity<GetMemoWidgetResponse> readMemoWidget(@PathVariable("memoWidgetId") Long memoWidgetId) {
-        MemoWidgetIdRequest memoWidgetIdRequest = MemoWidgetIdRequest.from(memoWidgetId);
+        MemoWidgetFindRequest memoWidgetFindRequest = MemoWidgetFindRequest.from(memoWidgetId);
         GetMemoWidgetResponse getMemoWidgetResponse = GetMemoWidgetResponse.from(
-                memoWidgetService.getMemoWidget(memoWidgetIdRequest));
+                memoWidgetService.getMemoWidget(memoWidgetFindRequest));
 
         return ResponseEntity.ok(getMemoWidgetResponse);
     }
@@ -59,8 +59,8 @@ public class MemoWidgetController implements MemoWidgetApiSpec {
 
     @DeleteMapping("memoWidgets/{memoWidgetId}")
     public ResponseEntity<Void> deleteMemoWidget(@PathVariable("memoWidgetId") Long memoWidgetId) {
-        MemoWidgetIdRequest memoWidgetIdRequest = MemoWidgetIdRequest.from(memoWidgetId);
-        memoWidgetService.deleteMemoWidget(memoWidgetIdRequest);
+        MemoWidgetFindRequest memoWidgetFindRequest = MemoWidgetFindRequest.from(memoWidgetId);
+        memoWidgetService.deleteMemoWidget(memoWidgetFindRequest);
 
         return ResponseEntity.noContent().build();
     }

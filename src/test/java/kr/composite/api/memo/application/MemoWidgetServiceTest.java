@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import jakarta.persistence.EntityManager;
 import kr.composite.api.memo.application.dto.request.MemoWidgetAddRequest;
-import kr.composite.api.memo.application.dto.request.MemoWidgetIdRequest;
+import kr.composite.api.memo.application.dto.request.MemoWidgetFindRequest;
 import kr.composite.api.memo.application.dto.request.MemoWidgetUpdateRequest;
 import kr.composite.api.memo.application.dto.response.MemoWidgetResponse;
 import kr.composite.api.memo.domain.MemoContent;
@@ -46,8 +46,8 @@ class MemoWidgetServiceTest {
         entityManager.clear();
 
         // when
-        MemoWidgetIdRequest memoWidgetIdRequest = MemoWidgetIdRequest.from(memoWidget.getId());
-        MemoWidgetResponse memoWidgetResponse = memoWidgetService.getMemoWidget(memoWidgetIdRequest);
+        MemoWidgetFindRequest memoWidgetFindRequest = MemoWidgetFindRequest.from(memoWidget.getId());
+        MemoWidgetResponse memoWidgetResponse = memoWidgetService.getMemoWidget(memoWidgetFindRequest);
 
         // then
         assertThat(memoWidgetResponse.id()).isEqualTo(memoWidget.getId());
@@ -59,9 +59,9 @@ class MemoWidgetServiceTest {
     @Test
     void 존재하지_않는_메모를_조회시_예외가_발생한다() {
         // given
-        MemoWidgetIdRequest memoWidgetIdRequest = MemoWidgetIdRequest.from(9999L);
+        MemoWidgetFindRequest memoWidgetFindRequest = MemoWidgetFindRequest.from(9999L);
         // when & then
-        assertThatThrownBy(() -> memoWidgetService.getMemoWidget(memoWidgetIdRequest)).isInstanceOf(
+        assertThatThrownBy(() -> memoWidgetService.getMemoWidget(memoWidgetFindRequest)).isInstanceOf(
                 IllegalArgumentException.class);
     }
 
@@ -132,10 +132,10 @@ class MemoWidgetServiceTest {
         entityManager.flush();
         entityManager.clear();
 
-        MemoWidgetIdRequest memoWidgetIdRequest = MemoWidgetIdRequest.from(memoWidget.getId());
+        MemoWidgetFindRequest memoWidgetFindRequest = MemoWidgetFindRequest.from(memoWidget.getId());
 
         // when
-        memoWidgetService.deleteMemoWidget(memoWidgetIdRequest);
+        memoWidgetService.deleteMemoWidget(memoWidgetFindRequest);
 
         // then
         assertThat(springDataJpaMemoWidgetRepository.findById(memoWidget.getId())).isEmpty();
