@@ -2,9 +2,8 @@ package kr.composite.api.lesson.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.NoArgsConstructor;
-
 import java.util.regex.Pattern;
+import lombok.NoArgsConstructor;
 
 @Embeddable
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
@@ -24,13 +23,13 @@ public class LessonPassword {
 
     private void validateValue(String value) {
         if (value == null) {
-            throw new IllegalArgumentException();
+            throw LessonDomainException.emptyPassword();
         }
         if (value.length() < MIN_LENGTH || value.length() > MAX_LENGTH) {
-            throw new IllegalArgumentException();
+            throw LessonDomainException.invalidPasswordLength(MIN_LENGTH, MAX_LENGTH);
         }
         if (!ALPHABET_NUMERIC_PATTERN.matcher(value).matches()) {
-            throw new IllegalArgumentException();
+            throw LessonDomainException.invalidPasswordPattern();
         }
     }
 }

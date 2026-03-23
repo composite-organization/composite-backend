@@ -1,11 +1,11 @@
 package kr.composite.api.attachment.domain;
 
-import jakarta.persistence.AttributeConverter;
-import jakarta.persistence.Converter;
-
 import java.util.Arrays;
+import lombok.Getter;
 
+@Getter
 public enum AttachmentUnit {
+
     KB("KB"),
     MB("MB");
 
@@ -15,28 +15,10 @@ public enum AttachmentUnit {
         this.description = description;
     }
 
-    @Converter
-    public static class AttachmentUnitConverter implements AttributeConverter<AttachmentUnit, String> {
-
-        @Override
-        public String convertToDatabaseColumn(AttachmentUnit attachmentUnit) {
-            if (attachmentUnit == null) {
-                return null;
-            }
-
-            return attachmentUnit.description;
-        }
-
-        @Override
-        public AttachmentUnit convertToEntityAttribute(String dbData) {
-            if (dbData == null) {
-                return null;
-            }
-
-            return Arrays.stream(values())
-                    .filter(value -> value.description.equals(dbData))
-                    .findFirst()
-                    .orElseThrow(IllegalArgumentException::new);
-        }
+    public static AttachmentUnit fromDescription(String description) {
+        return Arrays.stream(values())
+                .filter(value -> value.description.equals(description))
+                .findFirst()
+                .orElseThrow(() -> AttachmentDomainException.invalidUnitDescription(description));
     }
 }

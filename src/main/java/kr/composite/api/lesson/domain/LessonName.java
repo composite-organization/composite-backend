@@ -21,10 +21,10 @@ public class LessonName {
 
     private void validateValue(String value) {
         if (value == null) {
-            throw new IllegalArgumentException();
+            throw LessonDomainException.emptyName();
         }
         if (value.length() < MIN_LENGTH || value.length() > MAX_LENGTH) {
-            throw new IllegalArgumentException();
+            throw LessonDomainException.invalidNameLength(value, MIN_LENGTH, MAX_LENGTH);
         }
     }
 }

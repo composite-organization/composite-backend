@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import kr.composite.api.global.domain.BaseEntity;
+import kr.composite.api.widget.infrastructure.WidgetTypeConverter;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,6 +20,6 @@ public class Widget extends BaseEntity {
     private Long lessonId;
 
     @Column(name = "type")
-    @Convert(converter = WidgetType.WidgetTypeConverter.class)
+    @Convert(converter = WidgetTypeConverter.class)
     private WidgetType widgetType;
 }

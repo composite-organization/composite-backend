@@ -23,4 +23,9 @@ public class MemoWidget extends BaseEntity {
 
     @Embedded
     private MemoContent content;
+
+    public void update(String title, String content) {
+        this.title = new MemoTitle(title);
+        this.content = new MemoContent(content);
+    }
 }
