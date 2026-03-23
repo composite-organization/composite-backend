@@ -7,8 +7,8 @@ import kr.composite.api.attachment.application.dto.request.AttachmentWidgetDelet
 import kr.composite.api.attachment.application.dto.request.AttachmentWidgetFindRequest;
 import kr.composite.api.attachment.ui.apiSpec.AttachmentWidgetApiSpec;
 import kr.composite.api.attachment.ui.dto.request.PostAttachmentWidgetRequest;
-import kr.composite.api.attachment.ui.dto.response.PostAttachmentWidgetResponse;
 import kr.composite.api.attachment.ui.dto.response.GetAttachmentWidgetResponse;
+import kr.composite.api.attachment.ui.dto.response.PostAttachmentWidgetResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -46,7 +46,8 @@ public class AttachmentWidgetController implements AttachmentWidgetApiSpec {
 
     @DeleteMapping("/attachmentWidgets/{attachmentWidgetId}")
     public ResponseEntity<Void> deleteAttachmentWidget(@PathVariable("attachmentWidgetId") Long attachmentWidgetId) {
-        AttachmentWidgetDeleteRequest attachmentWidgetDeleteRequest = AttachmentWidgetDeleteRequest.from(attachmentWidgetId);
+        AttachmentWidgetDeleteRequest attachmentWidgetDeleteRequest = AttachmentWidgetDeleteRequest.from(
+                attachmentWidgetId);
         attachmentWidgetService.deleteAttachmentWidget(attachmentWidgetDeleteRequest);
 
         return ResponseEntity.noContent().build();

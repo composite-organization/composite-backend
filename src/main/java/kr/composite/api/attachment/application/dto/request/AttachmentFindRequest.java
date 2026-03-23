@@ -6,6 +6,6 @@ public record AttachmentFindRequest(
 ) {
 
     public static AttachmentFindRequest of(Long attachmentId, Long attachmentWidgetId) {
-        return new AttachmentFindRequest(attachmentId,attachmentWidgetId);
+        return new AttachmentFindRequest(attachmentId, attachmentWidgetId);
     }
 }
