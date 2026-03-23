@@ -7,7 +7,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("첨부파일 크기(AttachmentSize) 도메인 테스트")
 class AttachmentSizeTest {
 
     @Test
