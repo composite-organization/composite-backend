@@ -11,6 +11,28 @@ spring:
   flyway:
     enabled: ${FLYWAY_ENABLED}
 
+  cloud:
+    aws:
+      credentials:
+        access-key: ${AWS_ACCESS_KEY}
+        secret-key: ${AWS_SECRET_KEY}
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: ${MAX_FILE_SIZE}
+      max-request-size: ${MAX_REQUEST_SIZE}
+
+external:
+  aws:
+    s3:
+      region: ${AWS_S3_REGION}
+      attachment:
+        bucket:
+          name: ${AWS_S3_ATTACHMENT_BUCKET_NAME}
+        key:
+          prefix: ${AWS_S3_ATTACHMENT_KEY_PREFIX}
+
   jpa:
     hibernate:
       ddl-auto: ${JPA_DDL_AUTO}
