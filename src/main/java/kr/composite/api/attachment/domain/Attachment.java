@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import kr.composite.api.attachment.infrastructure.AttachmentUnitConverter;
 import kr.composite.api.global.domain.BaseEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -29,6 +30,6 @@ public class Attachment extends BaseEntity {
     private AttachmentSize attachmentSize;
 
     @Column(name = "unit")
-    @Convert(converter = AttachmentUnit.AttachmentUnitConverter.class)
+    @Convert(converter = AttachmentUnitConverter.class)
     private AttachmentUnit unit;
 }
