@@ -111,7 +111,7 @@ class AttachmentServiceTest {
         // given
         Long attachmentWidgetId = 1L;
         Attachment attachment = saveAttachment(attachmentWidgetId, "s3-storage-key", "report.pdf");
-        AttachmentDeleteRequest attachmentDeleteRequest = AttachmentDeleteRequest.from(
+        AttachmentDeleteRequest attachmentDeleteRequest = AttachmentDeleteRequest.of(
                 attachment.getId(),
                 attachmentWidgetId);
 

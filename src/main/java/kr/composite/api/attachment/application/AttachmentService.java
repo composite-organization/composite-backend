@@ -29,7 +29,7 @@ public class AttachmentService {
     @Transactional
     public AttachmentResponse addAttachment(AttachmentWidgetFindRequest request, MultipartFile attachment) {
 
-        if (attachment.getSize() > 10 * 1024 * 1024) {
+        if (attachment.getSize() > 10 * 1024 * 1024) { // 10MB
             throw new IllegalArgumentException("파일 크기는 10MB를 초과할 수 없습니다.");
         }
 
@@ -52,7 +52,8 @@ public class AttachmentService {
                 attachmentUploadedRequest.key(),
                 attachmentName,
                 attachmentSize,
-                attachmentUnit);
+                attachmentUnit
+        );
 
         attachmentRepository.save(attachment);
 

@@ -72,7 +72,7 @@ public class AttachmentController implements AttachmentApiSpec {
             @PathVariable("attachmentWidgetId") Long attachmentWidgetId,
             @PathVariable("attachmentId") Long attachmentId
     ) {
-        AttachmentDeleteRequest attachmentDeleteRequest = AttachmentDeleteRequest.from(attachmentId,
+        AttachmentDeleteRequest attachmentDeleteRequest = AttachmentDeleteRequest.of(attachmentId,
                 attachmentWidgetId);
         attachmentService.deleteAttachment(attachmentDeleteRequest);
 

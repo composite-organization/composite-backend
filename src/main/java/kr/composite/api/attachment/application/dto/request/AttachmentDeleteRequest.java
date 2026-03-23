@@ -5,7 +5,7 @@ public record AttachmentDeleteRequest(
         Long attachmentWidgetId
 ) {
 
-    public static AttachmentDeleteRequest from(Long attachmentId, Long attachmentWidgetId) {
+    public static AttachmentDeleteRequest of(Long attachmentId, Long attachmentWidgetId) {
         return new AttachmentDeleteRequest(attachmentId, attachmentWidgetId);
     }
 }
