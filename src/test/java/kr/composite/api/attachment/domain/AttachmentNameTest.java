@@ -42,7 +42,7 @@ class AttachmentNameTest {
             String name = "a".repeat(0);
 
             // when & then
-            assertThatThrownBy(() -> new AttachmentName(name)).isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> new AttachmentName(name)).isInstanceOf(AttachmentDomainException.class);
         }
     }
 }
