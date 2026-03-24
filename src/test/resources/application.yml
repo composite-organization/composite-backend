@@ -16,7 +16,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create-drop
     properties:
       hibernate:
         format_sql: true
@@ -27,3 +27,8 @@ spring:
     console:
       enabled: true
       path: /h2-console
+
+authentication:
+  jwt:
+    expiration: 1h
+    secret: KL4xHZeqaesSNpfonXEnTd3FMG3fUQYyXkYUvYCyuoE=
