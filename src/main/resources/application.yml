@@ -23,6 +23,14 @@ spring:
       max-file-size: ${MAX_FILE_SIZE}
       max-request-size: ${MAX_REQUEST_SIZE}
 
+  jpa:
+    hibernate:
+      ddl-auto: ${JPA_DDL_AUTO}
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
 external:
   aws:
     s3:
@@ -32,11 +40,3 @@ external:
           name: ${AWS_S3_ATTACHMENT_BUCKET_NAME}
         key:
           prefix: ${AWS_S3_ATTACHMENT_KEY_PREFIX}
-
-  jpa:
-    hibernate:
-      ddl-auto: ${JPA_DDL_AUTO}
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.MySQLDialect
