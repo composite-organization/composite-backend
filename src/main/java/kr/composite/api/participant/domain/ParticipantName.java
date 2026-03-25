@@ -22,11 +22,11 @@ public class ParticipantName {
     }
 
     private void validateValue(String value) {
-        if (value == null) {
-            throw new IllegalArgumentException();
+        if (value == null || value.isBlank()) {
+            throw ParticipantDomainException.emptyName();
         }
         if (value.length() < MIN_LENGTH || value.length() > MAX_LENGTH) {
-            throw new IllegalArgumentException();
+            throw ParticipantDomainException.invalidNameLength(value, MIN_LENGTH, MAX_LENGTH);
         }
     }
 }

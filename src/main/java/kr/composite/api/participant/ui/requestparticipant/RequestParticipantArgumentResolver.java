@@ -1,6 +1,7 @@
 package kr.composite.api.participant.ui.requestparticipant;
 
 import kr.composite.api.participant.domain.Participant;
+import kr.composite.api.participant.ui.ParticipantUIException;
 import kr.composite.api.participant.domain.ParticipantRepository;
 import kr.composite.api.participant.domain.Student;
 import kr.composite.api.participant.domain.StudentRepository;
@@ -38,22 +39,22 @@ public class RequestParticipantArgumentResolver implements HandlerMethodArgument
             WebDataBinderFactory binderFactory
     ) {
         Long userId = requestUserIdContext.get()
-                .orElseThrow(() -> new IllegalArgumentException("인증 정보가 필요한 요청입니다."));
+                .orElseThrow(ParticipantUIException::authRequired);
         Participant participant = participantRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("참여자 정보가 존재하지 않습니다."));
+                .orElseThrow(() -> ParticipantUIException.participantNotFound(userId));
         Class<?> parameterType = parameter.getParameterType();
         if (Student.class.equals(parameterType)) {
             return studentRepository.findByParticipantId(participant.getId())
-                    .orElseThrow(() -> new IllegalArgumentException("해당 참여자는 학생이 아닙니다."));
+                    .orElseThrow(() -> ParticipantUIException.studentNotFound(participant.getId()));
         }
         if (Teacher.class.equals(parameterType)) {
             return teacherRepository.findByParticipantId(participant.getId())
-                    .orElseThrow(() -> new IllegalArgumentException("해당 참여자는 수업자가 아닙니다."));
+                    .orElseThrow(() -> ParticipantUIException.teacherNotFound(participant.getId()));
         }
         if (Participant.class.isAssignableFrom(parameterType)) {
             return participant;
         }
 
-        throw new IllegalArgumentException("지원하지 않는 @RequestParticipant 타입입니다: " + parameterType.getSimpleName());
+        throw ParticipantUIException.unsupportedParticipantType(parameterType.getSimpleName());
     }
 }
