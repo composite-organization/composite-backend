@@ -1,3 +1,4 @@
+-- @formatter:off
 CREATE TABLE IF NOT EXISTS lesson (
     id BIGINT NOT NULL AUTO_INCREMENT,
     name VARCHAR(255) NULL,
