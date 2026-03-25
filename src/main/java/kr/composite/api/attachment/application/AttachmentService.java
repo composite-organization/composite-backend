@@ -74,7 +74,7 @@ public class AttachmentService {
                         .filter(StringUtils::hasText)
                         .orElse("");
 
-        String key = keyPrefix + UUID.randomUUID() + extension;
+        String key = keyPrefix + UUID.randomUUID() + "." + extension;
 
         return key;
     }
