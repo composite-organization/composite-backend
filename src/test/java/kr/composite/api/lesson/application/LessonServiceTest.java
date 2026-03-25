@@ -19,8 +19,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.event.EventListener;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
@@ -49,11 +49,11 @@ class LessonServiceTest {
     }
 
     // 테스트용 이벤트 리스너
-    static class TestEventListener implements ApplicationListener<StudentParticipateEvent> {
+    static class TestEventListener {
         private final List<StudentParticipateEvent> events = new ArrayList<>();
 
-        @Override
-        public void onApplicationEvent(StudentParticipateEvent event) {
+        @EventListener
+        public void listen(StudentParticipateEvent event) {
             events.add(event);
         }
 
@@ -97,8 +97,8 @@ class LessonServiceTest {
         // 3. 이벤트가 발행되었는지 확인
         assertThat(testEventListener.getEvents()).hasSize(1);
         StudentParticipateEvent event = testEventListener.getEvents().get(0);
-        assertThat(event.getLessonId()).isEqualTo(lessonId);
-        assertThat(event.getStudent().getId()).isEqualTo(student.getId());
+        assertThat(event.lessonId()).isEqualTo(lessonId);
+        assertThat(event.student().getId()).isEqualTo(student.getId());
     }
 
     @Test
