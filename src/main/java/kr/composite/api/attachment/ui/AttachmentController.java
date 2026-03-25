@@ -46,8 +46,8 @@ public class AttachmentController implements AttachmentApiSpec {
         AttachmentWidgetFindRequest attachmentWidgetFindRequest = AttachmentWidgetFindRequest.from(attachmentWidgetId);
         List<GetAttachmentMetaDataResponse> getAttachmentMetaDataResponse =
                 attachmentService.readAttachmentMetaData(attachmentWidgetFindRequest).stream()
-                .map(GetAttachmentMetaDataResponse::from)
-                .toList();
+                        .map(GetAttachmentMetaDataResponse::from)
+                        .toList();
 
         return ResponseEntity.ok().body(getAttachmentMetaDataResponse);
     }

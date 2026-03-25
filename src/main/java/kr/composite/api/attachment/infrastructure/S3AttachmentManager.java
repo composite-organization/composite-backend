@@ -33,7 +33,6 @@ public class S3AttachmentManager implements AttachmentStorage, AttachmentUriProv
     @Override
     public void upload(InputStream inputStream, String key, String contentType, Long size) {
 
-
         try {
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)

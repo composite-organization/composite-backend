@@ -65,7 +65,6 @@ public class AttachmentService {
 
         AttachmentResponse attachmentResponse = addAttachmentDb(request, attachmentUploadedRequest);
 
-
         return attachmentResponse;
     }
 
