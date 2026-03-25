@@ -2,8 +2,10 @@ package kr.composite.api.user.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @Embeddable
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class UserName {
