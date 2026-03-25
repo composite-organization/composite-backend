@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import kr.composite.api.lesson.application.LessonApplicationException;
 import kr.composite.api.lesson.ui.dto.request.JoinLessonRequest;
 import kr.composite.api.participant.domain.Participant;
 import kr.composite.api.participant.domain.ParticipantRepository;
@@ -110,7 +112,7 @@ class LessonServiceTest {
         // when & then
         final JoinLessonRequest requestForSecondAttempt = new JoinLessonRequest("두번째참여");
         assertThatThrownBy(() -> lessonService.joinStudent(lessonId, savedUser, requestForSecondAttempt))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(LessonApplicationException.class)
                 .hasMessage("이미 참여한 사용자입니다.");
     }
 

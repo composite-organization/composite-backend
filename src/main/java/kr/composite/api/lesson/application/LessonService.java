@@ -25,7 +25,7 @@ public class LessonService {
     @Transactional
     public void joinStudent(Long lessonId, User user, JoinLessonRequest request) {
         if (participantRepository.existsByLessonIdAndUserId(lessonId, user.getId())) {
-            throw new IllegalStateException("이미 참여한 사용자입니다.");
+            throw LessonApplicationException.alreadyJoined();
         }
         ParticipantName participantName = new ParticipantName(
                 Optional.ofNullable(request.name()).orElse(user.getName().getValue())
