@@ -1,6 +1,5 @@
 package kr.composite.api.attachment.ui;
 
-import java.net.URI;
 import java.util.List;
 import kr.composite.api.attachment.application.AttachmentService;
 import kr.composite.api.attachment.application.dto.request.AttachmentDeleteRequest;
@@ -11,6 +10,7 @@ import kr.composite.api.attachment.ui.dto.response.GetAttachmentMetaDataResponse
 import kr.composite.api.attachment.ui.dto.response.GetAttachmentResponse;
 import kr.composite.api.attachment.ui.dto.response.PostAttachmentResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -62,9 +62,7 @@ public class AttachmentController implements AttachmentApiSpec {
         PostAttachmentResponse postAttachmentResponse = PostAttachmentResponse.from(
                 attachmentService.addAttachment(attachmentWidgetFindRequest, attachment));
 
-        return ResponseEntity.created(URI.create(
-                "attachmentWidgets/" + postAttachmentResponse.attachmentWidgetId() + "/attachments/"
-                        + postAttachmentResponse.id())).body(postAttachmentResponse);
+        return ResponseEntity.status(HttpStatus.CREATED).body(postAttachmentResponse);
     }
 
     @DeleteMapping("attachmentWidgets/{attachmentWidgetId}/attachments/{attachmentId}")
