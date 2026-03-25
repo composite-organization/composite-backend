@@ -1,6 +1,7 @@
 package kr.composite.api.user.ui.requestuser;
 
 import kr.composite.api.user.domain.Guest;
+import kr.composite.api.user.ui.UserUIException;
 import kr.composite.api.user.domain.GuestRepository;
 import kr.composite.api.user.domain.Member;
 import kr.composite.api.user.domain.MemberRepository;
@@ -37,21 +38,21 @@ public class RequestUserArgumentResolver implements HandlerMethodArgumentResolve
             WebDataBinderFactory binderFactory
     ) {
         Long userId = requestUserIdContext.get()
-                .orElseThrow(() -> new IllegalArgumentException("사용자 정보가 필요한 요청입니다."));
+                .orElseThrow(UserUIException::authRequired);
         Class<?> parameterType = parameter.getParameterType();
         if (User.class.equals(parameterType)) {
             return userRepository.findById(userId)
-                    .orElseThrow(() -> new IllegalArgumentException("사용자 정보가 존재하지 않습니다."));
+                    .orElseThrow(() -> UserUIException.userNotFound(userId));
         }
         if (Member.class.equals(parameterType)) {
             return memberRepository.findByUserId(userId)
-                    .orElseThrow(() -> new IllegalArgumentException("회원 정보가 존재하지 않습니다."));
+                    .orElseThrow(() -> UserUIException.memberNotFound(userId));
         }
         if (Guest.class.equals(parameterType)) {
             return guestRepository.findByUserId(userId)
-                    .orElseThrow(() -> new IllegalArgumentException("게스트 정보가 존재하지 않습니다."));
+                    .orElseThrow(() -> UserUIException.guestNotFound(userId));
         }
 
-        throw new IllegalArgumentException("지원하지 않는 @RequestUser 타입입니다: " + parameterType.getSimpleName());
+        throw UserUIException.unsupportedUserType(parameterType.getSimpleName());
     }
 }
