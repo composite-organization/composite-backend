@@ -1,12 +1,10 @@
 package kr.composite.api.user.ui.requestuser;
 
+import kr.composite.api.user.application.UserService;
 import kr.composite.api.user.domain.Guest;
-import kr.composite.api.user.ui.UserUIException;
-import kr.composite.api.user.domain.GuestRepository;
 import kr.composite.api.user.domain.Member;
-import kr.composite.api.user.domain.MemberRepository;
 import kr.composite.api.user.domain.User;
-import kr.composite.api.user.domain.UserRepository;
+import kr.composite.api.user.ui.UserUIException;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.core.MethodParameter;
@@ -21,9 +19,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 public class RequestUserArgumentResolver implements HandlerMethodArgumentResolver {
 
     private final RequestUserIdContext requestUserIdContext;
-    private final UserRepository userRepository;
-    private final MemberRepository memberRepository;
-    private final GuestRepository guestRepository;
+    private final UserService userService;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -39,20 +35,18 @@ public class RequestUserArgumentResolver implements HandlerMethodArgumentResolve
     ) {
         Long userId = requestUserIdContext.get()
                 .orElseThrow(UserUIException::authRequired);
+        User user = userService.getUser(userId);
         Class<?> parameterType = parameter.getParameterType();
         if (User.class.equals(parameterType)) {
-            return userRepository.findById(userId)
-                    .orElseThrow(() -> UserUIException.userNotFound(userId));
+            return user;
         }
         if (Member.class.equals(parameterType)) {
-            return memberRepository.findByUserId(userId)
-                    .orElseThrow(() -> UserUIException.memberNotFound(userId));
+            return userService.getMember(user);
         }
         if (Guest.class.equals(parameterType)) {
-            return guestRepository.findByUserId(userId)
-                    .orElseThrow(() -> UserUIException.guestNotFound(userId));
+            return userService.getGuest(user);
         }
 
-        throw UserUIException.unsupportedUserType(parameterType.getSimpleName());
+        throw UserUIException.unsupportedUserType();
     }
 }

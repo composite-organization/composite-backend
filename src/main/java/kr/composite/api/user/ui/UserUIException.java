@@ -22,38 +22,10 @@ public class UserUIException extends BusinessException {
         );
     }
 
-    public static UserUIException userNotFound(Long userId) {
-        return new UserUIException(
-                generateCode(2),
-                "사용자 정보가 존재하지 않습니다.",
-                "제공된 사용자 ID: " + userId,
-                Category.NOT_FOUND
-        );
-    }
-
-    public static UserUIException memberNotFound(Long userId) {
-        return new UserUIException(
-                generateCode(3),
-                "회원 정보가 존재하지 않습니다.",
-                "제공된 사용자 ID: " + userId,
-                Category.NOT_FOUND
-        );
-    }
-
-    public static UserUIException guestNotFound(Long userId) {
-        return new UserUIException(
-                generateCode(4),
-                "게스트 정보가 존재하지 않습니다.",
-                "제공된 사용자 ID: " + userId,
-                Category.NOT_FOUND
-        );
-    }
-
-    public static UserUIException unsupportedUserType(String typeName) {
+    public static UserUIException unsupportedUserType() {
         return new UserUIException(
                 generateCode(5),
                 "지원하지 않는 사용자 타입입니다.",
-                "요청된 타입: " + typeName,
                 Category.VALIDATION
         );
     }

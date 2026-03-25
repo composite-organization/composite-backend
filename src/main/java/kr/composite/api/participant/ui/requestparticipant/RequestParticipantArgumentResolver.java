@@ -1,12 +1,10 @@
 package kr.composite.api.participant.ui.requestparticipant;
 
+import kr.composite.api.participant.application.ParticipantService;
 import kr.composite.api.participant.domain.Participant;
-import kr.composite.api.participant.ui.ParticipantUIException;
-import kr.composite.api.participant.domain.ParticipantRepository;
 import kr.composite.api.participant.domain.Student;
-import kr.composite.api.participant.domain.StudentRepository;
 import kr.composite.api.participant.domain.Teacher;
-import kr.composite.api.participant.domain.TeacherRepository;
+import kr.composite.api.participant.ui.ParticipantUIException;
 import kr.composite.api.user.ui.requestuser.RequestUserIdContext;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
@@ -22,9 +20,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 public class RequestParticipantArgumentResolver implements HandlerMethodArgumentResolver {
 
     private final RequestUserIdContext requestUserIdContext;
-    private final ParticipantRepository participantRepository;
-    private final StudentRepository studentRepository;
-    private final TeacherRepository teacherRepository;
+    private final ParticipantService participantService;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -40,21 +36,18 @@ public class RequestParticipantArgumentResolver implements HandlerMethodArgument
     ) {
         Long userId = requestUserIdContext.get()
                 .orElseThrow(ParticipantUIException::authRequired);
-        Participant participant = participantRepository.findByUserId(userId)
-                .orElseThrow(() -> ParticipantUIException.participantNotFound(userId));
+        Participant participant = participantService.getParticipant(userId);
         Class<?> parameterType = parameter.getParameterType();
         if (Student.class.equals(parameterType)) {
-            return studentRepository.findByParticipantId(participant.getId())
-                    .orElseThrow(() -> ParticipantUIException.studentNotFound(participant.getId()));
+            return participantService.getStudent(participant);
         }
         if (Teacher.class.equals(parameterType)) {
-            return teacherRepository.findByParticipantId(participant.getId())
-                    .orElseThrow(() -> ParticipantUIException.teacherNotFound(participant.getId()));
+            return participantService.getTeacher(participant);
         }
         if (Participant.class.isAssignableFrom(parameterType)) {
             return participant;
         }
 
-        throw ParticipantUIException.unsupportedParticipantType(parameterType.getSimpleName());
+        throw ParticipantUIException.unsupportedParticipantType();
     }
 }

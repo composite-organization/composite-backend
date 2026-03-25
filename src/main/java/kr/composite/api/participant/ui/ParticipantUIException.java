@@ -22,38 +22,10 @@ public class ParticipantUIException extends BusinessException {
         );
     }
 
-    public static ParticipantUIException participantNotFound(Long userId) {
-        return new ParticipantUIException(
-                generateCode(2),
-                "참여자 정보가 존재하지 않습니다.",
-                "제공된 사용자 ID: " + userId,
-                Category.NOT_FOUND
-        );
-    }
-
-    public static ParticipantUIException studentNotFound(Long participantId) {
-        return new ParticipantUIException(
-                generateCode(3),
-                "해당 참여자는 학생이 아닙니다.",
-                "제공된 참여자 ID: " + participantId,
-                Category.NOT_FOUND
-        );
-    }
-
-    public static ParticipantUIException teacherNotFound(Long participantId) {
-        return new ParticipantUIException(
-                generateCode(4),
-                "해당 참여자는 수업자가 아닙니다.",
-                "제공된 참여자 ID: " + participantId,
-                Category.NOT_FOUND
-        );
-    }
-
-    public static ParticipantUIException unsupportedParticipantType(String typeName) {
+    public static ParticipantUIException unsupportedParticipantType() {
         return new ParticipantUIException(
                 generateCode(5),
                 "지원하지 않는 참여자 타입입니다.",
-                "요청된 타입: " + typeName,
                 Category.VALIDATION
         );
     }
