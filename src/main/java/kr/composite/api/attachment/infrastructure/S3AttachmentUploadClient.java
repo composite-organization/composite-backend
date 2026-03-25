@@ -55,7 +55,6 @@ public class S3AttachmentUploadClient implements AttachmentUploadClient {
 
             return new AttachmentUploadedRequest(file.getOriginalFilename(), file.getSize(), key);
         } catch (S3Exception s3Exception) {
-            System.out.println(s3Exception.getMessage());
             throw new IllegalArgumentException(s3Exception.getMessage());
         } catch (SdkClientException sdkClientException) {
             throw new IllegalArgumentException();
