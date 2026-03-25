@@ -27,6 +27,7 @@ public record GetAttachmentMetaDataResponse(
                 attachmentMetaDataResponse.attachmentWidgetId(),
                 attachmentMetaDataResponse.name(),
                 attachmentMetaDataResponse.size(),
-                attachmentMetaDataResponse.unit());
+                attachmentMetaDataResponse.unit()
+        );
     }
 }

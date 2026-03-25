@@ -25,7 +25,9 @@ public class AttachmentWidgetController implements AttachmentWidgetApiSpec {
     private final AttachmentWidgetService attachmentWidgetService;
 
     @GetMapping("/attachmentWidgets/{attachmentWidgetId}")
-    public ResponseEntity<GetAttachmentWidgetResponse> readAttachmentWidget(@PathVariable Long attachmentWidgetId) {
+    public ResponseEntity<GetAttachmentWidgetResponse> readAttachmentWidget(
+            @PathVariable("attachmentWidgetId") Long attachmentWidgetId
+    ) {
         AttachmentWidgetFindRequest attachmentWidgetFindRequest = AttachmentWidgetFindRequest.from(attachmentWidgetId);
         GetAttachmentWidgetResponse getAttachmentWidgetResponse = GetAttachmentWidgetResponse.from(
                 attachmentWidgetService.getAttachmentWidget(attachmentWidgetFindRequest));

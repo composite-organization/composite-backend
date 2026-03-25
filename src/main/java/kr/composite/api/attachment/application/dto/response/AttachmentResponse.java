@@ -8,7 +8,6 @@ public record AttachmentResponse(
         String name,
         Double size,
         String unit
-
 ) {
 
     public static AttachmentResponse from(Attachment attachment) {
@@ -16,7 +15,7 @@ public record AttachmentResponse(
                 attachment.getId(),
                 attachment.getAttachmentWidgetId(),
                 attachment.getAttachmentName().getValue(),
-                attachment.getAttachmentSize().getFormattedSize(),
+                attachment.getAttachmentSize().getFormattedSize(attachment.getUnit().getThreshold()),
                 attachment.getUnit().name()
         );
     }

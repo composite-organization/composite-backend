@@ -16,6 +16,7 @@ public record GetAttachmentWidgetResponse(
     public static GetAttachmentWidgetResponse from(AttachmentWidgetResponse attachmentWidgetResponse) {
         return new GetAttachmentWidgetResponse(
                 attachmentWidgetResponse.id(),
-                attachmentWidgetResponse.widgetId());
+                attachmentWidgetResponse.widgetId()
+        );
     }
 }

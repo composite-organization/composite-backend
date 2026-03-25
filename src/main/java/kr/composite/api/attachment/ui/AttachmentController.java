@@ -44,8 +44,8 @@ public class AttachmentController implements AttachmentApiSpec {
             @PathVariable("attachmentWidgetId") Long attachmentWidgetId
     ) {
         AttachmentWidgetFindRequest attachmentWidgetFindRequest = AttachmentWidgetFindRequest.from(attachmentWidgetId);
-        List<GetAttachmentMetaDataResponse> getAttachmentMetaDataResponse = attachmentService.readAttachmentMetaData(
-                        attachmentWidgetFindRequest).stream()
+        List<GetAttachmentMetaDataResponse> getAttachmentMetaDataResponse =
+                attachmentService.readAttachmentMetaData(attachmentWidgetFindRequest).stream()
                 .map(GetAttachmentMetaDataResponse::from)
                 .toList();
 
@@ -72,8 +72,8 @@ public class AttachmentController implements AttachmentApiSpec {
             @PathVariable("attachmentWidgetId") Long attachmentWidgetId,
             @PathVariable("attachmentId") Long attachmentId
     ) {
-        AttachmentDeleteRequest attachmentDeleteRequest = AttachmentDeleteRequest.of(attachmentId,
-                attachmentWidgetId);
+        AttachmentDeleteRequest attachmentDeleteRequest =
+                AttachmentDeleteRequest.of(attachmentId, attachmentWidgetId);
         attachmentService.deleteAttachment(attachmentDeleteRequest);
 
         return ResponseEntity.noContent().build();

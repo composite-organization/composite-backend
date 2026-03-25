@@ -36,8 +36,8 @@ class AttachmentWidgetServiceTest {
     private AttachmentWidgetService attachmentWidgetService;
 
     @Test
-    @DisplayName("첨부파일 위젯을 조회할 수 있다")
-    void 첨부파일_위젯을_조회할_수_있다() {
+    @DisplayName("자료 공유 위젯을 조회할 수 있다")
+    void 자료_공유_위젯을_조회할_수_있다() {
         // given
         Widget widget = new Widget(1L, WidgetType.ATTACHMENT);
         widgetRepository.save(widget);
@@ -59,8 +59,8 @@ class AttachmentWidgetServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 첨부파일 위젯 조회 시 예외가 발생한다")
-    void 존재하지_않는_첨부파일_위젯_조회_예외_테스트() {
+    @DisplayName("존재하지 않는 자료 공유 위젯 조회 시 예외가 발생한다")
+    void 존재하지_않는_자료_공유_위젯_조회_예외_테스트() {
         // given
         AttachmentWidgetFindRequest request = AttachmentWidgetFindRequest.from(9999L);
 
@@ -70,8 +70,8 @@ class AttachmentWidgetServiceTest {
     }
 
     @Test
-    @DisplayName("첨부파일 위젯을 생성할 수 있다")
-    void 첨부파일_위젯을_생성할_수_있다() {
+    @DisplayName("자료 공유 위젯을 생성할 수 있다")
+    void 자료_공유_위젯을_생성할_수_있다() {
         // given
         Long lessonId = 1L;
         AttachmentWidgetAddRequest request = new AttachmentWidgetAddRequest(lessonId);
@@ -91,8 +91,8 @@ class AttachmentWidgetServiceTest {
     }
 
     @Test
-    @DisplayName("첨부파일 위젯을 삭제하면 연결된 Widget도 함께 삭제된다")
-    void 첨부파일_위젯을_삭제할_수_있다() {
+    @DisplayName("자료 공유 위젯을 삭제하면 연결된 Widget도 함께 삭제된다")
+    void 자료_공유_위젯을_삭제할_수_있다() {
         // given
         Widget widget = new Widget(1L, WidgetType.ATTACHMENT);
         widgetRepository.save(widget);
