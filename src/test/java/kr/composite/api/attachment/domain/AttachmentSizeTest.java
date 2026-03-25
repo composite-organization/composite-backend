@@ -20,37 +20,6 @@ class AttachmentSizeTest {
     }
 
     @Nested
-    @DisplayName("단위 판별 로직 검증")
-    class UnitValidation {
-
-        @Test
-        void 자료_크기가_1MB_이상이면_MB_단위를_반환할_수_있다() {
-            // given
-            long oneMegaByte = 1024L * 1024L;
-            AttachmentSize size = new AttachmentSize(oneMegaByte);
-
-            // when
-            AttachmentUnit unit = size.getAppropriateUnit();
-
-            // then
-            assertThat(unit).isEqualTo(AttachmentUnit.MB);
-        }
-
-        @Test
-        void 자료_크기가_1MB_미만이면_KB_단위를_반환할_수_있다() {
-            // given
-            long slightlyLessThanMega = (1024L * 1024L) - 1;
-            AttachmentSize size = new AttachmentSize(slightlyLessThanMega);
-
-            // when
-            AttachmentUnit unit = size.getAppropriateUnit();
-
-            // then
-            assertThat(unit).isEqualTo(AttachmentUnit.KB);
-        }
-    }
-
-    @Nested
     @DisplayName("포맷팅된 사이즈 값 계산 검증")
     class FormattedSizeValidation {
 
@@ -59,9 +28,10 @@ class AttachmentSizeTest {
             // given
             long twoMegaByte = 2L * 1024L * 1024L;
             AttachmentSize size = new AttachmentSize(twoMegaByte);
+            AttachmentUnit attachmentUnit = AttachmentUnit.getAppropriateUnit(twoMegaByte);
 
             // when
-            double formattedSize = size.getFormattedSize();
+            double formattedSize = size.getFormattedSize(attachmentUnit.getThreshold());
 
             // then
             assertThat(formattedSize).isEqualTo(2.0);
@@ -72,9 +42,10 @@ class AttachmentSizeTest {
             // given
             long halfKiloByte = 512L;
             AttachmentSize size = new AttachmentSize(halfKiloByte);
+            AttachmentUnit attachmentUnit = AttachmentUnit.getAppropriateUnit(halfKiloByte);
 
             // when
-            double formattedSize = size.getFormattedSize();
+            double formattedSize = size.getFormattedSize(attachmentUnit.getThreshold());
 
             // then
             // 512 / 1024 = 0.5
