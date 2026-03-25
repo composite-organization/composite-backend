@@ -1,9 +1,9 @@
 package kr.composite.api.attachment.infrastructure;
 
+import java.io.InputStream;
 import java.time.Duration;
-import java.util.UUID;
-import kr.composite.api.attachment.application.dto.request.AttachmentUploadedRequest;
-import org.springframework.web.multipart.MultipartFile;
+import kr.composite.api.attachment.domain.AttachmentStorage;
+import kr.composite.api.attachment.domain.AttachmentUriProvider;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -14,46 +14,35 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
-public class S3AttachmentUploadClient implements AttachmentUploadClient {
+public class S3AttachmentManager implements AttachmentStorage, AttachmentUriProvider {
 
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
     private final String bucketName;
-    private final String keyPrefix;
 
-
-    public S3AttachmentUploadClient(
+    public S3AttachmentManager(
             S3Client s3Client,
             S3Presigner s3Presigner,
-            String bucketName,
-            String keyPrefix
+            String bucketName
     ) {
         this.s3Client = s3Client;
         this.s3Presigner = s3Presigner;
         this.bucketName = bucketName;
-        this.keyPrefix = keyPrefix;
     }
 
     @Override
-    public AttachmentUploadedRequest uploadImage(MultipartFile file) {
-        String originalFilename = file.getOriginalFilename();
-        String extension = "";
-        if (originalFilename != null && originalFilename.contains(".")) {
-            extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-        }
+    public void upload(InputStream inputStream, String key, String contentType, Long size) {
 
-        String key = keyPrefix + UUID.randomUUID() + extension;
 
         try {
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
                     .key(key)
-                    .contentType(file.getContentType())
+                    .contentType(contentType)
                     .build();
 
-            s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+            s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(inputStream, size));
 
-            return new AttachmentUploadedRequest(file.getOriginalFilename(), file.getSize(), key);
         } catch (S3Exception s3Exception) {
             throw new IllegalArgumentException(s3Exception.getMessage());
         } catch (SdkClientException sdkClientException) {
@@ -64,7 +53,7 @@ public class S3AttachmentUploadClient implements AttachmentUploadClient {
     }
 
     @Override
-    public String generatePresignUrl(String key) {
+    public String getReadUri(String key) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
                 .key(key)

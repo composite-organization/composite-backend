@@ -1,7 +1,7 @@
 package kr.composite.api.attachment.ui.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import kr.composite.api.attachment.application.dto.response.AttachmentUrlResponse;
+import kr.composite.api.attachment.application.dto.response.AttachmentUriResponse;
 
 @Schema(description = "수업자료 조회 응답")
 public record GetAttachmentResponse(
@@ -10,7 +10,7 @@ public record GetAttachmentResponse(
         String url
 ) {
 
-    public static GetAttachmentResponse from(AttachmentUrlResponse attachmentUrlResponse) {
-        return new GetAttachmentResponse(attachmentUrlResponse.presignedUrl());
+    public static GetAttachmentResponse from(AttachmentUriResponse attachmentUriResponse) {
+        return new GetAttachmentResponse(attachmentUriResponse.presignedUrl());
     }
 }

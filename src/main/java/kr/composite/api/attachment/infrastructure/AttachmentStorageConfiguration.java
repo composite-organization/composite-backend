@@ -1,5 +1,7 @@
 package kr.composite.api.attachment.infrastructure;
 
+import kr.composite.api.attachment.domain.AttachmentStorage;
+import kr.composite.api.attachment.domain.AttachmentUriProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,7 +12,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 @Configuration
-public class AttachmentUploadClientConfiguration {
+public class AttachmentStorageConfiguration {
 
     @Value("${spring.cloud.aws.credentials.access-key}")
     private String accessKey;
@@ -19,13 +21,22 @@ public class AttachmentUploadClientConfiguration {
     private String secretKey;
 
     @Bean
-    public AttachmentUploadClient s3AttachmentUploadClient(
+    public S3AttachmentManager s3AttachmentManager(
             @Value("${external.aws.s3.attachment.bucket.name}") String bucketName,
-            @Value("${external.aws.s3.attachment.key.prefix}") String keyPrefix,
             S3Client s3Client,
             S3Presigner s3Presigner
     ) {
-        return new S3AttachmentUploadClient(s3Client, s3Presigner, bucketName, keyPrefix);
+        return new S3AttachmentManager(s3Client, s3Presigner, bucketName);
+    }
+
+    @Bean
+    public AttachmentStorage attachmentStorage(S3AttachmentManager s3AttachmentManager) {
+        return s3AttachmentManager;
+    }
+
+    @Bean
+    public AttachmentUriProvider attachmentUriProvider(S3AttachmentManager s3AttachmentManager) {
+        return s3AttachmentManager;
     }
 
     @Bean

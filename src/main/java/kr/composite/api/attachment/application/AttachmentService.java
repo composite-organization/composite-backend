@@ -1,22 +1,29 @@
 package kr.composite.api.attachment.application;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import kr.composite.api.attachment.application.dto.request.AttachmentDeleteRequest;
 import kr.composite.api.attachment.application.dto.request.AttachmentFindRequest;
 import kr.composite.api.attachment.application.dto.request.AttachmentUploadedRequest;
 import kr.composite.api.attachment.application.dto.request.AttachmentWidgetFindRequest;
 import kr.composite.api.attachment.application.dto.response.AttachmentMetaDataResponse;
 import kr.composite.api.attachment.application.dto.response.AttachmentResponse;
-import kr.composite.api.attachment.application.dto.response.AttachmentUrlResponse;
+import kr.composite.api.attachment.application.dto.response.AttachmentUriResponse;
 import kr.composite.api.attachment.domain.Attachment;
 import kr.composite.api.attachment.domain.AttachmentName;
 import kr.composite.api.attachment.domain.AttachmentRepository;
 import kr.composite.api.attachment.domain.AttachmentSize;
+import kr.composite.api.attachment.domain.AttachmentStorage;
 import kr.composite.api.attachment.domain.AttachmentUnit;
-import kr.composite.api.attachment.infrastructure.AttachmentUploadClient;
+import kr.composite.api.attachment.domain.AttachmentUriProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -24,19 +31,53 @@ import org.springframework.web.multipart.MultipartFile;
 public class AttachmentService {
 
     private final AttachmentRepository attachmentRepository;
-    private final AttachmentUploadClient attachmentUploadClient;
+    private final AttachmentStorage attachmentStorage;
+    private final AttachmentUriProvider attachmentUriProvider;
+
+    @Value("${external.aws.s3.attachment.key.prefix}")
+    private String keyPrefix;
 
     @Transactional
     public AttachmentResponse addAttachment(AttachmentWidgetFindRequest request, MultipartFile attachment) {
 
-        if (attachment.getSize() > 10 * 1024 * 1024) { // 10MB
+        Long maxSizeBytes = 10 * AttachmentUnit.MB.getThreshold();
+        if (attachment.getSize() > maxSizeBytes) {
             throw new IllegalArgumentException("파일 크기는 10MB를 초과할 수 없습니다.");
         }
 
-        AttachmentUploadedRequest attachmentUploadedRequest = attachmentUploadClient.uploadImage(attachment);
+        String originalFilename = attachment.getOriginalFilename();
+        String contentType = attachment.getContentType();
+        Long size = attachment.getSize();
+
+        String key = createKey(originalFilename);
+
+        try (InputStream inputStream = attachment.getInputStream()) {
+            attachmentStorage.upload(inputStream, key, contentType, size);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("파일 읽기 중 오류가 발생했습니다.", e);
+        }
+
+        AttachmentUploadedRequest attachmentUploadedRequest = new AttachmentUploadedRequest(
+                originalFilename,
+                size,
+                key
+        );
+
         AttachmentResponse attachmentResponse = addAttachmentDb(request, attachmentUploadedRequest);
 
+
         return attachmentResponse;
+    }
+
+    private String createKey(String originalFilename) {
+        String extension =
+                Optional.ofNullable(StringUtils.getFilenameExtension(originalFilename))
+                        .filter(StringUtils::hasText)
+                        .orElse("");
+
+        String key = keyPrefix + UUID.randomUUID() + extension;
+
+        return key;
     }
 
     private AttachmentResponse addAttachmentDb(
@@ -45,7 +86,7 @@ public class AttachmentService {
     ) {
         AttachmentName attachmentName = new AttachmentName(attachmentUploadedRequest.name());
         AttachmentSize attachmentSize = new AttachmentSize(attachmentUploadedRequest.size());
-        AttachmentUnit attachmentUnit = attachmentSize.getAppropriateUnit();
+        AttachmentUnit attachmentUnit = AttachmentUnit.getAppropriateUnit(attachmentSize.getValue());
 
         Attachment attachment = new Attachment(
                 attachmentWidgetFindRequest.id(),
@@ -68,13 +109,13 @@ public class AttachmentService {
                 .toList();
     }
 
-    public AttachmentUrlResponse readAttachment(AttachmentFindRequest request) {
+    public AttachmentUriResponse readAttachment(AttachmentFindRequest request) {
         Attachment attachment = attachmentRepository.findById(request.attachmentId())
                 .orElseThrow(() -> new IllegalArgumentException());
 
-        String presignedUrl = attachmentUploadClient.generatePresignUrl(attachment.getAttachmentKey());
+        String presignedUrl = attachmentUriProvider.getReadUri(attachment.getAttachmentKey());
 
-        return AttachmentUrlResponse.from(presignedUrl);
+        return AttachmentUriResponse.from(presignedUrl);
     }
 
     @Transactional
@@ -87,6 +128,6 @@ public class AttachmentService {
         }
 
         attachmentRepository.deleteById(attachmentDeleteRequest.attachmentId());
-        attachmentUploadClient.deleteAttachment(attachment.getAttachmentKey());
+        attachmentStorage.deleteAttachment(attachment.getAttachmentKey());
     }
 }
