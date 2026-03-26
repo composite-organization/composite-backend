@@ -20,8 +20,8 @@ public class Attachment extends BaseEntity {
     @Column(name = "attachment_widget_id")
     private Long attachmentWidgetId;
 
-    @Column(name = "url")
-    private String url;
+    @Column(name = "attachment_key")
+    private String attachmentKey;
 
     @Embedded
     private AttachmentName attachmentName;
