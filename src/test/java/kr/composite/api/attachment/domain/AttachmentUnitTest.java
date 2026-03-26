@@ -81,8 +81,8 @@ class AttachmentUnitTest {
     @DisplayName("각_단위의_임계값이_올바르게_설정되어_있다")
     void 각_단위의_임계값이_올바르게_설정되어_있다() {
         assertAll(
-                () -> assertThat(AttachmentUnit.MB.getThreshold()).isEqualTo(1024L * 1024L),
-                () -> assertThat(AttachmentUnit.KB.getThreshold()).isEqualTo(1024L)
+                () -> assertThat(AttachmentUnit.MB.getByteSize()).isEqualTo(1024L * 1024L),
+                () -> assertThat(AttachmentUnit.KB.getByteSize()).isEqualTo(1024L)
         );
     }
 }

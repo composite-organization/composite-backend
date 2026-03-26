@@ -15,7 +15,7 @@ public record AttachmentResponse(
                 attachment.getId(),
                 attachment.getAttachmentWidgetId(),
                 attachment.getAttachmentName().getValue(),
-                attachment.getAttachmentSize().getFormattedSize(attachment.getUnit().getThreshold()),
+                attachment.getAttachmentSize().getFormattedSize(attachment.getUnit().getByteSize()),
                 attachment.getUnit().name()
         );
     }

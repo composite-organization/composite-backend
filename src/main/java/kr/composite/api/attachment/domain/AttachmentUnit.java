@@ -10,11 +10,11 @@ public enum AttachmentUnit {
     KB("KB", 1024L);
 
     private final String description;
-    private final Long threshold;
+    private final Long byteSize;
 
-    AttachmentUnit(String description, Long threshold) {
+    AttachmentUnit(String description, Long byteSize) {
         this.description = description;
-        this.threshold = threshold;
+        this.byteSize = byteSize;
     }
 
     public static AttachmentUnit fromDescription(String description) {
@@ -24,10 +24,10 @@ public enum AttachmentUnit {
                 .orElseThrow(() -> AttachmentDomainException.invalidUnitDescription(description));
     }
 
-    public static AttachmentUnit getAppropriateUnit(Long threshold) {
-        if (threshold >= MB.threshold) {
-            return MB;
-        }
-        return KB;
+    public static AttachmentUnit getAppropriateUnit(Long byteSize) {
+        return Arrays.stream(AttachmentUnit.values())
+                .filter(unit -> byteSize >= unit.byteSize)
+                .findFirst()
+                .orElse(KB);
     }
 }
