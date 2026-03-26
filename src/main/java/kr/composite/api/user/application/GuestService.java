@@ -7,7 +7,7 @@ import kr.composite.api.user.domain.GuestRepository;
 import kr.composite.api.user.domain.User;
 import kr.composite.api.user.domain.UserName;
 import kr.composite.api.user.domain.UserRepository;
-import kr.composite.api.user.ui.dto.request.PostGuestCredentialRequest;
+import kr.composite.api.user.ui.dto.request.CreateGuestCredentialRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +21,7 @@ public class GuestService {
     private final CredentialCodec credentialCodec;
 
     @Transactional
-    public String addGuestCredential(PostGuestCredentialRequest request) {
+    public String addGuestCredential(CreateGuestCredentialRequest request) {
         User user = new User(new UserName(request.name()));
         User savedUser = userRepository.save(user);
 

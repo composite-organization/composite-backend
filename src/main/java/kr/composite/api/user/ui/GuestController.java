@@ -4,7 +4,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import kr.composite.api.user.application.GuestService;
 import kr.composite.api.user.ui.apiSpec.GuestApiSpec;
-import kr.composite.api.user.ui.dto.request.PostGuestCredentialRequest;
+import kr.composite.api.user.ui.dto.request.CreateGuestCredentialRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +25,7 @@ public class GuestController implements GuestApiSpec {
     @PostMapping("/credentials")
     public ResponseEntity<Void> createCredentials(
             HttpServletResponse response,
-            @Valid @RequestBody PostGuestCredentialRequest request
+            @Valid @RequestBody CreateGuestCredentialRequest request
     ) {
         String token = guestService.addGuestCredential(request);
         credentialTranslator.inject(response, token);

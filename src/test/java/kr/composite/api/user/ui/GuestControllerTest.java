@@ -6,7 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.composite.api.user.ui.dto.request.PostGuestCredentialRequest;
+import kr.composite.api.user.ui.dto.request.CreateGuestCredentialRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ class GuestControllerTest {
     void createCredentials() throws Exception {
         // given
         String guestName = "홍길동";
-        PostGuestCredentialRequest request = new PostGuestCredentialRequest(guestName);
+        CreateGuestCredentialRequest request = new CreateGuestCredentialRequest(guestName);
 
         // when & then
         mockMvc.perform(post("/guests/credentials")
