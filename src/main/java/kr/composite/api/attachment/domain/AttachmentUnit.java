@@ -6,13 +6,15 @@ import lombok.Getter;
 @Getter
 public enum AttachmentUnit {
 
-    KB("KB"),
-    MB("MB");
+    MB("MB", 1024L * 1024L),
+    KB("KB", 1024L);
 
     private final String description;
+    private final Long byteSize;
 
-    AttachmentUnit(String description) {
+    AttachmentUnit(String description, Long byteSize) {
         this.description = description;
+        this.byteSize = byteSize;
     }
 
     public static AttachmentUnit fromDescription(String description) {
@@ -20,5 +22,12 @@ public enum AttachmentUnit {
                 .filter(value -> value.description.equals(description))
                 .findFirst()
                 .orElseThrow(() -> AttachmentDomainException.invalidUnitDescription(description));
+    }
+
+    public static AttachmentUnit getAppropriateUnit(Long byteSize) {
+        return Arrays.stream(AttachmentUnit.values())
+                .filter(unit -> byteSize >= unit.byteSize)
+                .findFirst()
+                .orElse(KB);
     }
 }
