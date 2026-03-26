@@ -38,14 +38,14 @@ public class RequestParticipantArgumentResolver implements HandlerMethodArgument
                 .orElseThrow(ParticipantUIException::authRequired);
         Participant participant = participantService.getParticipant(userId);
         Class<?> parameterType = parameter.getParameterType();
+        if (Participant.class.equals(parameterType)) {
+            return participant;
+        }
         if (Student.class.equals(parameterType)) {
             return participantService.getStudent(participant);
         }
         if (Teacher.class.equals(parameterType)) {
             return participantService.getTeacher(participant);
-        }
-        if (Participant.class.isAssignableFrom(parameterType)) {
-            return participant;
         }
 
         throw ParticipantUIException.unsupportedParticipantType();
