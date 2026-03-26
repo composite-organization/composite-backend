@@ -39,7 +39,7 @@ class GuestControllerTest {
         mockMvc.perform(post("/guests/credentials")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(header().exists(HttpHeaders.AUTHORIZATION))
                 .andExpect(result -> {
                     String token = result.getResponse().getHeader(HttpHeaders.AUTHORIZATION);
