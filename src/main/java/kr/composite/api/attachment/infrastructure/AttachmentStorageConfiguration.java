@@ -27,7 +27,7 @@ public class AttachmentStorageConfiguration {
             S3Client s3Client,
             S3Presigner s3Presigner
     ) {
-        return new S3AttachmentManager(s3Client, s3Presigner, bucketName,keyPrefix);
+        return new S3AttachmentManager(s3Client, s3Presigner, bucketName, keyPrefix);
     }
 
     @Bean
