@@ -7,7 +7,7 @@ spring:
     active: test
 
   datasource:
-    url: jdbc:h2:mem:test;MODE=MYSQL
+    url: jdbc:h2:mem:test;MODE=MySQL;NON_KEYWORDS=USER
     username: test
     password: test
 
