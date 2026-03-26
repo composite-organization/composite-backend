@@ -12,9 +12,7 @@ CREATE TABLE IF NOT EXISTS user (
 -- 2. guest 테이블 컬럼 수정 (user_id를 FK로 추가)
 ALTER TABLE guest DROP COLUMN name;
 ALTER TABLE guest ADD COLUMN user_id BIGINT NOT NULL;
-ALTER TABLE guest ADD CONSTRAINT fk_guest_user_id FOREIGN KEY (user_id) REFERENCES user (id);
 
 -- 3. member 테이블 컬럼 수정 (user_id를 FK로 추가)
 ALTER TABLE member DROP COLUMN name;
 ALTER TABLE member ADD COLUMN user_id BIGINT NOT NULL;
-ALTER TABLE member ADD CONSTRAINT fk_member_user_id FOREIGN KEY (user_id) REFERENCES user (id);
