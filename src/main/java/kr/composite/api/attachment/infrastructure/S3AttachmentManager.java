@@ -2,6 +2,7 @@ package kr.composite.api.attachment.infrastructure;
 
 import java.io.InputStream;
 import java.time.Duration;
+import kr.composite.api.attachment.domain.Attachment;
 import kr.composite.api.attachment.domain.AttachmentStorage;
 import kr.composite.api.attachment.domain.AttachmentUriProvider;
 import software.amazon.awssdk.core.exception.SdkClientException;
@@ -55,10 +56,10 @@ public class S3AttachmentManager implements AttachmentStorage, AttachmentUriProv
     }
 
     @Override
-    public String getUri(String key) {
+    public String getUri(Attachment attachment) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
-                .key(keyPrefix + key)
+                .key(keyPrefix + attachment.getAttachmentKey())
                 .build();
 
         GetObjectPresignRequest getObjectPresignRequest = GetObjectPresignRequest.builder()
@@ -70,11 +71,11 @@ public class S3AttachmentManager implements AttachmentStorage, AttachmentUriProv
     }
 
     @Override
-    public void deleteAttachment(String key) {
+    public void deleteAttachment(Attachment attachment) {
         try {
             DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
                     .bucket(bucketName)
-                    .key(keyPrefix + key)
+                    .key(keyPrefix + attachment.getAttachmentKey())
                     .build();
 
             s3Client.deleteObject(deleteObjectRequest);

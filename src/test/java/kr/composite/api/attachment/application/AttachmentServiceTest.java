@@ -100,7 +100,7 @@ class AttachmentServiceTest {
         Attachment attachment = saveAttachment(attachmentWidgetId, "s3-storage-key", "report.pdf");
 
         String expectedUrl = "https://s3.amazonaws.com/presigned-url-example";
-        given(attachmentUriProvider.getUri(attachment.getAttachmentKey())).willReturn(expectedUrl);
+        given(attachmentUriProvider.getUri(attachment)).willReturn(expectedUrl);
 
         AttachmentFindRequest request = new AttachmentFindRequest(attachment.getId(), attachmentWidgetId);
 

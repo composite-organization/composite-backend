@@ -114,7 +114,7 @@ public class AttachmentService {
         Attachment attachment = attachmentRepository.findById(request.attachmentId())
                 .orElseThrow(() -> new IllegalArgumentException());
 
-        String uri = attachmentUriProvider.getUri(attachment.getAttachmentKey());
+        String uri = attachmentUriProvider.getUri(attachment);
 
         return AttachmentUriResponse.from(uri);
     }
@@ -129,6 +129,6 @@ public class AttachmentService {
         }
 
         attachmentRepository.deleteById(attachmentDeleteRequest.attachmentId());
-        attachmentStorage.deleteAttachment(attachment.getAttachmentKey());
+        attachmentStorage.deleteAttachment(attachment);
     }
 }
