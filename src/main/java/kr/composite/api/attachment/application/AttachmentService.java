@@ -19,12 +19,11 @@ import kr.composite.api.attachment.domain.AttachmentSize;
 import kr.composite.api.attachment.domain.AttachmentStorage;
 import kr.composite.api.attachment.domain.AttachmentUnit;
 import kr.composite.api.attachment.domain.AttachmentUriProvider;
+import kr.composite.api.attachment.ui.dto.request.FileUploadRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -34,24 +33,18 @@ public class AttachmentService {
     private final AttachmentStorage attachmentStorage;
     private final AttachmentUriProvider attachmentUriProvider;
 
-    @Value("${external.aws.s3.attachment.key.prefix}")
-    private String keyPrefix;
-
     @Transactional
-    public AttachmentResponse addAttachment(AttachmentWidgetFindRequest request, MultipartFile attachment) {
+    public AttachmentResponse addAttachment(AttachmentWidgetFindRequest request, FileUploadRequest file) {
 
-        Long maxSizeBytes = 10 * AttachmentUnit.MB.getThreshold();
-        if (attachment.getSize() > maxSizeBytes) {
-            throw new IllegalArgumentException("파일 크기는 10MB를 초과할 수 없습니다.");
-        }
+        validateFileSize(file);
 
-        String originalFilename = attachment.getOriginalFilename();
-        String contentType = attachment.getContentType();
-        Long size = attachment.getSize();
+        String originalFilename = file.originalFileName();
+        String contentType = file.contentType();
+        Long size = file.size();
 
         String key = createKey(originalFilename);
 
-        try (InputStream inputStream = attachment.getInputStream()) {
+        try (InputStream inputStream = file.inputStream()) {
             attachmentStorage.upload(inputStream, key, contentType, size);
         } catch (IOException e) {
             throw new IllegalArgumentException("파일 읽기 중 오류가 발생했습니다.", e);
@@ -68,13 +61,20 @@ public class AttachmentService {
         return attachmentResponse;
     }
 
+    private void validateFileSize(FileUploadRequest file) {
+        long maxSizeBytes = 10 * AttachmentUnit.MB.getByteSize(); // 10MB
+        if (file.size() > maxSizeBytes) {
+            throw new IllegalArgumentException("파일 크기는 10MB를 초과할 수 없습니다.");
+        }
+    }
+
     private String createKey(String originalFilename) {
         String extension =
                 Optional.ofNullable(StringUtils.getFilenameExtension(originalFilename))
                         .filter(StringUtils::hasText)
                         .orElse("");
 
-        String key = keyPrefix + UUID.randomUUID() + "." + extension;
+        String key = UUID.randomUUID() + "." + extension;
 
         return key;
     }
@@ -100,6 +100,7 @@ public class AttachmentService {
         return AttachmentResponse.from(attachment);
     }
 
+    @Transactional(readOnly = true)
     public List<AttachmentMetaDataResponse> readAttachmentMetaData(AttachmentWidgetFindRequest request) {
         List<Attachment> attachments = attachmentRepository.findAllByAttachmentWidgetId(request.id());
 
@@ -108,13 +109,14 @@ public class AttachmentService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public AttachmentUriResponse readAttachment(AttachmentFindRequest request) {
         Attachment attachment = attachmentRepository.findById(request.attachmentId())
                 .orElseThrow(() -> new IllegalArgumentException());
 
-        String presignedUrl = attachmentUriProvider.getReadUri(attachment.getAttachmentKey());
+        String uri = attachmentUriProvider.getUri(attachment.getAttachmentKey());
 
-        return AttachmentUriResponse.from(presignedUrl);
+        return AttachmentUriResponse.from(uri);
     }
 
     @Transactional

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 import kr.composite.api.attachment.application.dto.request.AttachmentDeleteRequest;
 import kr.composite.api.attachment.application.dto.request.AttachmentFindRequest;
@@ -18,11 +19,11 @@ import kr.composite.api.attachment.domain.AttachmentSize;
 import kr.composite.api.attachment.domain.AttachmentStorage;
 import kr.composite.api.attachment.domain.AttachmentUnit;
 import kr.composite.api.attachment.domain.AttachmentUriProvider;
+import kr.composite.api.attachment.ui.dto.request.FileUploadRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,25 +47,30 @@ class AttachmentServiceTest {
     private String keyPrefix;
 
     @Test
-    void 파일을_업로드하면_S3_정보를_받아_DB에_저장할_수_있다() {
+    void 파일을_업로드하면_저장소에_업로드하고_DB에_저장할_수_있다() {
         // given
         Long widgetId = 1L;
         AttachmentWidgetFindRequest request = AttachmentWidgetFindRequest.from(widgetId);
-        MockMultipartFile mockFile = new MockMultipartFile(
-                "attachment",
-                "test-file.png",
-                "image/png",
-                "test content".getBytes()
+
+        String fileName = "test-file.png";
+        String contentType = "image/png";
+        byte[] content = "test content".getBytes();
+
+        FileUploadRequest fileUploadRequest = new FileUploadRequest(
+                fileName,
+                contentType,
+                (long) content.length,
+                new ByteArrayInputStream(content)
         );
 
         // when
-        AttachmentResponse response = attachmentService.addAttachment(request, mockFile);
+        AttachmentResponse response = attachmentService.addAttachment(request, fileUploadRequest);
 
         // then
         Attachment saved = attachmentRepository.findById(response.id()).orElseThrow();
         assertAll(
-                () -> assertThat(saved.getAttachmentKey()).startsWith(keyPrefix),
-                () -> assertThat(saved.getAttachmentName().getValue()).isEqualTo("test-file.png"),
+                () -> assertThat(saved.getAttachmentKey()).contains("."),
+                () -> assertThat(saved.getAttachmentName().getValue()).isEqualTo(fileName),
                 () -> assertThat(saved.getUnit()).isEqualTo(AttachmentUnit.KB)
         );
     }
@@ -94,7 +100,7 @@ class AttachmentServiceTest {
         Attachment attachment = saveAttachment(attachmentWidgetId, "s3-storage-key", "report.pdf");
 
         String expectedUrl = "https://s3.amazonaws.com/presigned-url-example";
-        given(attachmentUriProvider.getReadUri("s3-storage-key")).willReturn(expectedUrl);
+        given(attachmentUriProvider.getUri(attachment.getAttachmentKey())).willReturn(expectedUrl);
 
         AttachmentFindRequest request = new AttachmentFindRequest(attachment.getId(), attachmentWidgetId);
 

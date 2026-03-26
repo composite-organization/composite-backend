@@ -6,6 +6,7 @@ import kr.composite.api.attachment.application.dto.request.AttachmentDeleteReque
 import kr.composite.api.attachment.application.dto.request.AttachmentFindRequest;
 import kr.composite.api.attachment.application.dto.request.AttachmentWidgetFindRequest;
 import kr.composite.api.attachment.ui.apiSpec.AttachmentApiSpec;
+import kr.composite.api.attachment.ui.dto.request.FileUploadRequest;
 import kr.composite.api.attachment.ui.dto.response.GetAttachmentMetaDataResponse;
 import kr.composite.api.attachment.ui.dto.response.GetAttachmentResponse;
 import kr.composite.api.attachment.ui.dto.response.PostAttachmentResponse;
@@ -57,10 +58,11 @@ public class AttachmentController implements AttachmentApiSpec {
             @PathVariable("attachmentWidgetId") Long attachmentWidgetId,
             @RequestPart("attachment") MultipartFile attachment
     ) {
-
         AttachmentWidgetFindRequest attachmentWidgetFindRequest = AttachmentWidgetFindRequest.from(attachmentWidgetId);
+        FileUploadRequest fileUploadRequest = FileUploadRequest.from(attachment);
+
         PostAttachmentResponse postAttachmentResponse = PostAttachmentResponse.from(
-                attachmentService.addAttachment(attachmentWidgetFindRequest, attachment));
+                attachmentService.addAttachment(attachmentWidgetFindRequest, fileUploadRequest));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(postAttachmentResponse);
     }
