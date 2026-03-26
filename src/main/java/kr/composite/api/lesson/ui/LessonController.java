@@ -6,6 +6,7 @@ import kr.composite.api.lesson.ui.dto.request.JoinLessonRequest;
 import kr.composite.api.user.domain.User;
 import kr.composite.api.user.ui.requestuser.RequestUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +29,6 @@ public class LessonController implements LessonApiSpec {
             @RequestBody JoinLessonRequest request
     ) {
         lessonService.joinStudent(lessonId, user, request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

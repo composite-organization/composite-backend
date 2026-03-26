@@ -6,6 +6,7 @@ import kr.composite.api.user.application.GuestService;
 import kr.composite.api.user.ui.apiSpec.GuestApiSpec;
 import kr.composite.api.user.ui.dto.request.PostGuestCredentialRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,7 +30,7 @@ public class GuestController implements GuestApiSpec {
         String token = guestService.createGuestCredential(request);
         credentialTranslator.inject(response, token);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
 
