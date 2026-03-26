@@ -31,7 +31,7 @@ class AttachmentSizeTest {
             AttachmentUnit attachmentUnit = AttachmentUnit.getAppropriateUnit(twoMegaByte);
 
             // when
-            double formattedSize = size.getFormattedSize(attachmentUnit.getThreshold());
+            double formattedSize = size.getFormattedSize(attachmentUnit.getByteSize());
 
             // then
             assertThat(formattedSize).isEqualTo(2.0);
@@ -45,7 +45,7 @@ class AttachmentSizeTest {
             AttachmentUnit attachmentUnit = AttachmentUnit.getAppropriateUnit(halfKiloByte);
 
             // when
-            double formattedSize = size.getFormattedSize(attachmentUnit.getThreshold());
+            double formattedSize = size.getFormattedSize(attachmentUnit.getByteSize());
 
             // then
             // 512 / 1024 = 0.5

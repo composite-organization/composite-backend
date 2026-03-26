@@ -23,10 +23,11 @@ public class AttachmentStorageConfiguration {
     @Bean
     public S3AttachmentManager s3AttachmentManager(
             @Value("${external.aws.s3.attachment.bucket.name}") String bucketName,
+            @Value("${external.aws.s3.attachment.key.prefix}") String keyPrefix,
             S3Client s3Client,
             S3Presigner s3Presigner
     ) {
-        return new S3AttachmentManager(s3Client, s3Presigner, bucketName);
+        return new S3AttachmentManager(s3Client, s3Presigner, bucketName,keyPrefix);
     }
 
     @Bean

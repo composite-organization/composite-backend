@@ -6,5 +6,5 @@ public interface AttachmentStorage {
 
     void upload(InputStream inputStream, String key, String contentType, Long size);
 
-    void deleteAttachment(String attachmentKey);
+    void deleteAttachment(String key);
 }

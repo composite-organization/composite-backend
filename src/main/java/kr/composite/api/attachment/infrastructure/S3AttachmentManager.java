@@ -19,15 +19,18 @@ public class S3AttachmentManager implements AttachmentStorage, AttachmentUriProv
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
     private final String bucketName;
+    private final String keyPrefix;
 
     public S3AttachmentManager(
             S3Client s3Client,
             S3Presigner s3Presigner,
-            String bucketName
+            String bucketName,
+            String keyPrefix
     ) {
         this.s3Client = s3Client;
         this.s3Presigner = s3Presigner;
         this.bucketName = bucketName;
+        this.keyPrefix = keyPrefix;
     }
 
     @Override
@@ -36,7 +39,7 @@ public class S3AttachmentManager implements AttachmentStorage, AttachmentUriProv
         try {
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
-                    .key(key)
+                    .key(keyPrefix + key)
                     .contentType(contentType)
                     .build();
 
@@ -52,10 +55,10 @@ public class S3AttachmentManager implements AttachmentStorage, AttachmentUriProv
     }
 
     @Override
-    public String getReadUri(String key) {
+    public String getUri(String key) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
-                .key(key)
+                .key(keyPrefix + key)
                 .build();
 
         GetObjectPresignRequest getObjectPresignRequest = GetObjectPresignRequest.builder()
@@ -67,11 +70,11 @@ public class S3AttachmentManager implements AttachmentStorage, AttachmentUriProv
     }
 
     @Override
-    public void deleteAttachment(String attachmentKey) {
+    public void deleteAttachment(String key) {
         try {
             DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
                     .bucket(bucketName)
-                    .key(attachmentKey)
+                    .key(keyPrefix + key)
                     .build();
 
             s3Client.deleteObject(deleteObjectRequest);
