@@ -30,6 +30,14 @@ public class UserUIException extends BusinessException {
         );
     }
 
+    public static UserUIException userIdAlreadySet() {
+        return new UserUIException(
+                generateCode(6),
+                "사용자 ID는 이미 설정되어 있습니다.",
+                Category.VALIDATION
+        );
+    }
+
     private static String generateCode(int number) {
         return CODE_PREFIX + String.format("%03d", number);
     }
