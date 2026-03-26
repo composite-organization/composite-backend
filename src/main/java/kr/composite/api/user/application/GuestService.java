@@ -21,7 +21,7 @@ public class GuestService {
     private final CredentialCodec credentialCodec;
 
     @Transactional
-    public String createGuestCredential(PostGuestCredentialRequest request) {
+    public String addGuestCredential(PostGuestCredentialRequest request) {
         User user = new User(new UserName(request.name()));
         User savedUser = userRepository.save(user);
 

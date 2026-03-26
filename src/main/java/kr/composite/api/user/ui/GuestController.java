@@ -27,7 +27,7 @@ public class GuestController implements GuestApiSpec {
             HttpServletResponse response,
             @Valid @RequestBody PostGuestCredentialRequest request
     ) {
-        String token = guestService.createGuestCredential(request);
+        String token = guestService.addGuestCredential(request);
         credentialTranslator.inject(response, token);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
