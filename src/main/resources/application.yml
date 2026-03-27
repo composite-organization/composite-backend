@@ -34,7 +34,7 @@ spring:
 
 authentication:
   jwt:
-    expiration: 1h
+    expiration: ${JWT_EXPIRATION}
     secret: KL4xHZeqaesSNpfonXEnTd3FMG3fUQYyXkYUvYCyuoE=
 
 external:
