@@ -29,6 +29,7 @@ public class LessonController implements LessonApiSpec {
             @RequestBody JoinLessonRequest request
     ) {
         lessonService.joinStudent(lessonId, user, request);
+
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
