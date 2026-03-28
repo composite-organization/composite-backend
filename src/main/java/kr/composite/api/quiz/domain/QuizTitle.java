@@ -22,10 +22,10 @@ public class QuizTitle {
 
     private void validateValue(String value) {
         if (value == null) {
-            throw new IllegalArgumentException();
+            throw QuizDomainException.emptyTitle();
         }
         if (value.length() < MIN_LENGTH || value.length() > MAX_LENGTH) {
-            throw new IllegalArgumentException();
+            throw QuizDomainException.invalidTitleLength(value, MIN_LENGTH, MAX_LENGTH);
         }
     }
 }

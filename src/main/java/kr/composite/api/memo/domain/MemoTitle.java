@@ -22,10 +22,10 @@ public class MemoTitle {
 
     private void validateValue(String value) {
         if (value == null) {
-            throw new IllegalArgumentException();
+            throw MemoDomainException.emptyTitle();
         }
         if (value.length() > MAX_LENGTH) {
-            throw new IllegalArgumentException();
+            throw MemoDomainException.invalidTitleLength(MAX_LENGTH);
         }
     }
 }

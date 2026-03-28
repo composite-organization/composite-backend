@@ -43,7 +43,7 @@ class MemoContentTest {
             String content = "a".repeat(201);
 
             // when & then
-            assertThatThrownBy(() -> new MemoContent(content)).isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> new MemoContent(content)).isInstanceOf(MemoDomainException.class);
         }
     }
 }

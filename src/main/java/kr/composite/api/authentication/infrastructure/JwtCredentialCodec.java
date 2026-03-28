@@ -1,8 +1,12 @@
 package kr.composite.api.authentication.infrastructure;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Date;
@@ -41,12 +45,20 @@ public class JwtCredentialCodec implements CredentialCodec {
 
     @Override
     public CredentialPayload decode(String credential) {
-        Claims claims = Jwts.parser()
-                .verifyWith(secretKey)
-                .build()
-                .parseSignedClaims(credential)
-                .getPayload();
+        try {
+            Claims claims = Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(credential)
+                    .getPayload();
 
-        return new CredentialPayload(Long.parseLong(claims.getSubject()));
+            return new CredentialPayload(Long.parseLong(claims.getSubject()));
+        } catch (ExpiredJwtException e) {
+            throw AuthenticationInfrastructureException.expiredCredential(e);
+        } catch (SignatureException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
+            throw AuthenticationInfrastructureException.invalidCredential(e);
+        } catch (Exception e) {
+            throw AuthenticationInfrastructureException.unknown(e);
+        }
     }
 }

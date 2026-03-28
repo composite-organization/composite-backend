@@ -62,7 +62,7 @@ class MemoWidgetServiceTest {
         MemoWidgetFindRequest memoWidgetFindRequest = MemoWidgetFindRequest.from(9999L);
         // when & then
         assertThatThrownBy(() -> memoWidgetService.getMemoWidget(memoWidgetFindRequest)).isInstanceOf(
-                IllegalArgumentException.class);
+                MemoApplicationException.class);
     }
 
     @Test

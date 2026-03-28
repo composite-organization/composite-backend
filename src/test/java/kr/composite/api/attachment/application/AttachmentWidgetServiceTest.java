@@ -66,7 +66,7 @@ class AttachmentWidgetServiceTest {
 
         // when & then
         assertThatThrownBy(() -> attachmentWidgetService.getAttachmentWidget(request))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(AttachmentApplicationException.class);
     }
 
     @Test

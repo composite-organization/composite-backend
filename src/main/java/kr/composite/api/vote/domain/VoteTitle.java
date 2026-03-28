@@ -22,10 +22,10 @@ public class VoteTitle {
 
     private void validateValue(String value) {
         if (value == null) {
-            throw new IllegalArgumentException();
+            throw VoteDomainException.emptyTitle();
         }
         if (value.length() < MIN_LENGTH || value.length() > MAX_LENGTH) {
-            throw new IllegalArgumentException();
+            throw VoteDomainException.invalidTitleLength(value, MIN_LENGTH, MAX_LENGTH);
         }
     }
 }
