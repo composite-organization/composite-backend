@@ -7,7 +7,7 @@ spring:
     active: test
 
   datasource:
-    url: jdbc:h2:mem:test;MODE=MYSQL
+    url: jdbc:h2:mem:test;MODE=MySQL;NON_KEYWORDS=USER
     username: test
     password: test
 
@@ -25,6 +25,7 @@ spring:
       enabled: true
       max-file-size: 10MB
       max-request-size: 10MB
+
   jpa:
     hibernate:
       ddl-auto: validate
@@ -38,6 +39,11 @@ spring:
     console:
       enabled: true
       path: /h2-console
+
+authentication:
+  jwt:
+    expiration: 1h
+    secret: KL4xHZeqaesSNpfonXEnTd3FMG3fUQYyXkYUvYCyuoE=
 
 external:
   aws:

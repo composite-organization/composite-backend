@@ -1,18 +1,18 @@
 package kr.composite.api.user.domain;
 
 import jakarta.persistence.Embedded;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Entity;
 import kr.composite.api.global.domain.BaseEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Entity
 @Getter
-@MappedSuperclass
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class User extends BaseEntity {
+public class User extends BaseEntity {
 
     @Embedded
     private UserName name;

@@ -2,23 +2,25 @@ package kr.composite.api.participant.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Entity;
 import kr.composite.api.global.domain.BaseEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Entity
 @Getter
-@MappedSuperclass
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class Participant extends BaseEntity {
+public class Participant extends BaseEntity {
+
+    @Column(name = "user_id")
+    private Long userId;
 
     @Column(name = "lesson_id")
-    protected Long lessonId;
+    private Long lessonId;
 
     @Embedded
-    protected ParticipantName name;
+    private ParticipantName name;
 }
-

@@ -2,8 +2,10 @@ package kr.composite.api.participant.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @Embeddable
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class ParticipantName {
@@ -20,11 +22,11 @@ public class ParticipantName {
     }
 
     private void validateValue(String value) {
-        if (value == null) {
-            throw new IllegalArgumentException();
+        if (value == null || value.isBlank()) {
+            throw ParticipantDomainException.emptyName();
         }
         if (value.length() < MIN_LENGTH || value.length() > MAX_LENGTH) {
-            throw new IllegalArgumentException();
+            throw ParticipantDomainException.invalidNameLength(value, MIN_LENGTH, MAX_LENGTH);
         }
     }
 }
