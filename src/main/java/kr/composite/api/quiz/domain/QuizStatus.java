@@ -21,6 +21,6 @@ public enum QuizStatus {
         return Arrays.stream(values())
                 .filter(value -> value.description.equals(description))
                 .findFirst()
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> QuizDomainException.unsupportedStatus(description));
     }
 }

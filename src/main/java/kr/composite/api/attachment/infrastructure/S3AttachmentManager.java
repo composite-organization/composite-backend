@@ -47,11 +47,11 @@ public class S3AttachmentManager implements AttachmentStorage, AttachmentUriProv
             s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(inputStream, size));
 
         } catch (S3Exception s3Exception) {
-            throw new IllegalArgumentException(s3Exception.getMessage());
+            throw AttachmentInfrastructureException.s3UploadFailed(s3Exception.getMessage());
         } catch (SdkClientException sdkClientException) {
-            throw new IllegalArgumentException();
+            throw AttachmentInfrastructureException.sdkClientError(sdkClientException.getMessage());
         } catch (Exception exception) {
-            throw new IllegalArgumentException();
+            throw AttachmentInfrastructureException.unknownInfrastructureError();
         }
     }
 
@@ -80,11 +80,11 @@ public class S3AttachmentManager implements AttachmentStorage, AttachmentUriProv
 
             s3Client.deleteObject(deleteObjectRequest);
         } catch (S3Exception e) {
-            throw new IllegalArgumentException("S3 파일 삭제 중 오류가 발생했습니다.");
+            throw AttachmentInfrastructureException.s3DeleteFailed(e.getMessage());
         } catch (SdkClientException e) {
-            throw new IllegalArgumentException("S3 클라이언트 연결에 문제가 발생했습니다.");
+            throw AttachmentInfrastructureException.sdkClientError(e.getMessage());
         } catch (Exception e) {
-            throw new IllegalArgumentException(e);
+            throw AttachmentInfrastructureException.unknownInfrastructureError();
         }
     }
 }

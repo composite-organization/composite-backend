@@ -42,7 +42,7 @@ class MemoTitleTest {
             String title = "a".repeat(51);
 
             // when & then
-            assertThatThrownBy(() -> new MemoTitle(title)).isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> new MemoTitle(title)).isInstanceOf(MemoDomainException.class);
         }
     }
 }

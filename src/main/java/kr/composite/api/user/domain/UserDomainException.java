@@ -31,6 +31,15 @@ class UserDomainException extends BusinessException {
         );
     }
 
+    public static UserDomainException unsupportedRole(String description) {
+        return new UserDomainException(
+                generateCode(3),
+                "지원하지 않는 역할입니다.",
+                "제공된 역할: " + description,
+                Category.VALIDATION
+        );
+    }
+
     private static String generateCode(int number) {
         return CODE_PREFIX + String.format("%03d", number);
     }

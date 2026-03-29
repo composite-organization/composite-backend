@@ -47,7 +47,7 @@ public class AttachmentService {
         try (InputStream inputStream = file.inputStream()) {
             attachmentStorage.upload(inputStream, key, contentType, size);
         } catch (IOException e) {
-            throw new IllegalArgumentException("파일 읽기 중 오류가 발생했습니다.", e);
+            throw AttachmentApplicationException.fileReadFailed();
         }
 
         AttachmentUploadedRequest attachmentUploadedRequest = new AttachmentUploadedRequest(
@@ -64,7 +64,7 @@ public class AttachmentService {
     private void validateFileSize(FileUploadRequest file) {
         long maxSizeBytes = 10 * AttachmentUnit.MB.getByteSize(); // 10MB
         if (file.size() > maxSizeBytes) {
-            throw new IllegalArgumentException("파일 크기는 10MB를 초과할 수 없습니다.");
+            throw AttachmentApplicationException.fileSizeExceeded(file.size(), maxSizeBytes);
         }
     }
 
@@ -112,7 +112,7 @@ public class AttachmentService {
     @Transactional(readOnly = true)
     public AttachmentUriResponse readAttachment(AttachmentFindRequest request) {
         Attachment attachment = attachmentRepository.findById(request.attachmentId())
-                .orElseThrow(() -> new IllegalArgumentException());
+                .orElseThrow(AttachmentApplicationException::attachmentNotFound);
 
         String uri = attachmentUriProvider.getUri(attachment);
 

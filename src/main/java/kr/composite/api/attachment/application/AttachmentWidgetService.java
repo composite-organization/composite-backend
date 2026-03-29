@@ -23,7 +23,7 @@ public class AttachmentWidgetService {
     @Transactional(readOnly = true)
     public AttachmentWidgetResponse getAttachmentWidget(AttachmentWidgetFindRequest request) {
         AttachmentWidget attachmentWidget = attachmentWidgetRepository.findById(request.id())
-                .orElseThrow(() -> new IllegalArgumentException());
+                .orElseThrow(AttachmentApplicationException::widgetNotFound);
         AttachmentWidgetResponse attachmentWidgetResponse = AttachmentWidgetResponse.from(attachmentWidget);
 
         return attachmentWidgetResponse;

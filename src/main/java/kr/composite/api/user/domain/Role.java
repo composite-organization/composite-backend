@@ -20,6 +20,6 @@ public enum Role {
         return Arrays.stream(values())
                 .filter(role -> role.description.equals(description))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 역할입니다: " + description));
+                .orElseThrow(() -> UserDomainException.unsupportedRole(description));
     }
 }

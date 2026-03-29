@@ -25,7 +25,7 @@ public class MemoWidgetService {
     @Transactional(readOnly = true)
     public MemoWidgetResponse getMemoWidget(MemoWidgetFindRequest request) {
         MemoWidget memoWidget = memoWidgetRepository.findById(request.id())
-                .orElseThrow(() -> new IllegalArgumentException());
+                .orElseThrow(MemoApplicationException::widgetNotFound);
 
         MemoWidgetResponse memoWidgetResponse = MemoWidgetResponse.from(memoWidget);
 
@@ -48,7 +48,7 @@ public class MemoWidgetService {
     @Transactional
     public MemoWidgetResponse updateMemoWidget(MemoWidgetUpdateRequest request) {
         MemoWidget memoWidget = memoWidgetRepository.findById(request.memoWidgetId())
-                .orElseThrow(() -> new IllegalArgumentException());
+                .orElseThrow(MemoApplicationException::widgetNotFound);
 
         memoWidget.update(request.title(), request.content());
 
