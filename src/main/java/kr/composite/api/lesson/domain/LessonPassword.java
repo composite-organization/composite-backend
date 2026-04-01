@@ -32,4 +32,11 @@ public class LessonPassword {
             throw LessonDomainException.invalidPasswordPattern();
         }
     }
+
+    public void checkPassword(String password) {
+        if (this.value.equals(password)) {
+            return;
+        }
+        throw LessonDomainException.invalidPassword();
+    }
 }
