@@ -19,7 +19,17 @@ public class JpaTeacherRepository implements TeacherRepository {
     }
 
     @Override
-    public Optional<Teacher> findByParticipantId(Long participantId) {
-        return springDataJpaTeacherRepository.findByParticipantId(participantId);
+    public Optional<Teacher> findByLessonIdAndUserId(Long lessonId, Long userId) {
+        return springDataJpaTeacherRepository.findByLessonIdAndUserId(lessonId, userId);
+    }
+
+    @Override
+    public Optional<Teacher> findByUserId(Long userId) {
+        return springDataJpaTeacherRepository.findByUserId(userId);
+    }
+
+    @Override
+    public Optional<Teacher> findByLessonId(Long lessonId) {
+        return springDataJpaTeacherRepository.findByLessonId(lessonId);
     }
 }

@@ -6,5 +6,7 @@ public interface StudentRepository {
 
     Student save(Student student);
 
-    Optional<Student> findByParticipantId(Long participantId);
+    Optional<Student> findByLessonIdAndUserId(Long lessonId, Long userId);
+
+    Optional<Student> findByUserId(Long userId);
 }

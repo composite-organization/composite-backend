@@ -7,5 +7,7 @@ import java.util.Optional;
 
 public interface SpringDataJpaStudentRepository extends JpaRepository<Student, Long> {
 
-    Optional<Student> findByParticipantId(Long participantId);
+    Optional<Student> findByLessonIdAndUserId(Long lessonId, Long userId);
+
+    Optional<Student> findByUserId(Long userId);
 }

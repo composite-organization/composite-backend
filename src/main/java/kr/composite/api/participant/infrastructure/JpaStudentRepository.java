@@ -19,7 +19,12 @@ public class JpaStudentRepository implements StudentRepository {
     }
 
     @Override
-    public Optional<Student> findByParticipantId(Long participantId) {
-        return springDataJpaStudentRepository.findByParticipantId(participantId);
+    public Optional<Student> findByLessonIdAndUserId(Long lessonId, Long userId) {
+        return springDataJpaStudentRepository.findByLessonIdAndUserId(lessonId, userId);
+    }
+
+    @Override
+    public Optional<Student> findByUserId(Long userId) {
+        return springDataJpaStudentRepository.findByUserId(userId);
     }
 }

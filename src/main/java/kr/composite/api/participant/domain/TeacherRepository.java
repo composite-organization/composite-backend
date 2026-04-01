@@ -6,5 +6,9 @@ public interface TeacherRepository {
 
     Teacher save(Teacher teacher);
 
-    Optional<Teacher> findByParticipantId(Long participantId);
+    Optional<Teacher> findByLessonIdAndUserId(Long lessonId, Long userId);
+
+    Optional<Teacher> findByUserId(Long userId);
+
+    Optional<Teacher> findByLessonId(Long lessonId);
 }
