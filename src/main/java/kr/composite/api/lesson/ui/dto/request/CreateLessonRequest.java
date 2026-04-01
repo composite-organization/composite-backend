@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 @Schema(description = "수업 생성 요청")
 public record CreateLessonRequest(
         @NotNull
-        @Schema(description = "수업자 이름", example = "선생님")
+        @Schema(description = "수업자 이름", example = "김민기")
         String teacherName,
 
         @NotNull

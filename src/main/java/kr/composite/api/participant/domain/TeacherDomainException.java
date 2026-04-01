@@ -17,7 +17,7 @@ public class TeacherDomainException extends BusinessException {
     public static TeacherDomainException emptyName() {
         return new TeacherDomainException(
                 generateCode(1),
-                "선생님 이름이 비어있습니다.",
+                "수업자 이름이 비어있습니다.",
                 Category.VALIDATION
         );
     }
@@ -25,7 +25,7 @@ public class TeacherDomainException extends BusinessException {
     public static TeacherDomainException invalidNameLength(String name, int minLength, int maxLength) {
         return new TeacherDomainException(
                 generateCode(2),
-                "선생님 이름의 길이가 유효하지 않습니다. (최소 " + minLength + "자, 최대 " + maxLength + "자)",
+                "수업자 이름의 길이가 유효하지 않습니다. (최소 " + minLength + "자, 최대 " + maxLength + "자)",
                 "제공된 이름: " + name + " (길이: " + name.length() + ")",
                 Category.VALIDATION
         );

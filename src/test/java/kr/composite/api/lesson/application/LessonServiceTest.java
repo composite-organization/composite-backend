@@ -82,7 +82,7 @@ class LessonServiceTest {
     void 학생이_수업에_정상적으로_참여하고_참여_이벤트가_발행된다() {
         // given
         final String lessonCode = "CODE123";
-        CreateLessonResponse lessonResponse = lessonService.createLesson(savedUser, new CreateLessonRequest("선생님", "테스트수업", lessonCode, "pass123"));
+        CreateLessonResponse lessonResponse = lessonService.createLesson(savedUser, new CreateLessonRequest("수업자", "테스트수업", lessonCode, "pass123"));
         final Long lessonId = lessonResponse.lessonId();
         
         final String studentName = "참여자이름";
@@ -110,7 +110,7 @@ class LessonServiceTest {
     void 이미_참여한_학생은_중복으로_참여할_수_없다() {
         // given
         final String lessonCode = "CODE123";
-        lessonService.createLesson(savedUser, new CreateLessonRequest("선생님", "테스트수업", lessonCode, "pass123"));
+        lessonService.createLesson(savedUser, new CreateLessonRequest("수업자", "테스트수업", lessonCode, "pass123"));
         
         final User studentUser = userRepository.save(new User(new UserName("학생유저")));
         lessonService.joinStudent(lessonCode, studentUser, new JoinLessonRequest("첫번째참여"));
@@ -126,7 +126,7 @@ class LessonServiceTest {
     void 수업_참여_요청_시_이름이_없으면_기존_사용자_이름으로_참여한다() {
         // given
         final String lessonCode = "CODE123";
-        CreateLessonResponse lessonResponse = lessonService.createLesson(savedUser, new CreateLessonRequest("선생님", "테스트수업", lessonCode, "pass123"));
+        CreateLessonResponse lessonResponse = lessonService.createLesson(savedUser, new CreateLessonRequest("수업자", "테스트수업", lessonCode, "pass123"));
         final Long lessonId = lessonResponse.lessonId();
         
         final JoinLessonRequest request = new JoinLessonRequest(null); // 이름 없음
@@ -141,9 +141,9 @@ class LessonServiceTest {
     }
 
     @Test
-    void 수업을_정상적으로_생성하고_선생님이_등록된다() {
+    void 수업을_정상적으로_생성하고_수업자이_등록된다() {
         // given
-        final String teacherName = "선생님2";
+        final String teacherName = "수업자2";
         final String lessonName = "테스트수업2";
         final String newLessonCode = "NEWCODE";
         final String password = "password123";
@@ -166,7 +166,7 @@ class LessonServiceTest {
         // given
         final String findLessonCode = "FIND123";
         final String password = "password123";
-        lessonService.createLesson(savedUser, new CreateLessonRequest("선생님", "조회수업", findLessonCode, password));
+        lessonService.createLesson(savedUser, new CreateLessonRequest("수업자", "조회수업", findLessonCode, password));
         final FindMyLessonRequest request = new FindMyLessonRequest(findLessonCode, password);
 
         // when & then
@@ -177,7 +177,7 @@ class LessonServiceTest {
     void 수업을_정상적으로_조회한다() {
         // given
         final String lessonCode = "CODE123";
-        lessonService.createLesson(savedUser, new CreateLessonRequest("선생님", "테스트수업", lessonCode, "pass123"));
+        lessonService.createLesson(savedUser, new CreateLessonRequest("수업자", "테스트수업", lessonCode, "pass123"));
 
         // when
         var lessonResponse = lessonService.readLesson(lessonCode, savedUser);
@@ -190,7 +190,7 @@ class LessonServiceTest {
     void 권한이_없는_수업_조회_시_예외가_발생한다() {
         // given
         final String lessonCode = "CODE123";
-        lessonService.createLesson(savedUser, new CreateLessonRequest("선생님", "테스트수업", lessonCode, "pass123"));
+        lessonService.createLesson(savedUser, new CreateLessonRequest("수업자", "테스트수업", lessonCode, "pass123"));
         
         User anotherUser = userRepository.save(new User(new UserName("다른유저")));
 

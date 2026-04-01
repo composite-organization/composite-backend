@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 class TeacherTest {
 
     @Test
-    void 유효한_값으로_선생님을_생성할_수_있다() {
+    void 유효한_값으로_수업자을_생성할_수_있다() {
         // given
         Long userId = 1L;
         Long lessonId = 1L;

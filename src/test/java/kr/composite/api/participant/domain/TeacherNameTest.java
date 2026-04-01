@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 class TeacherNameTest {
 
     @Test
-    void 유효한_이름으로_선생님_이름을_생성할_수_있다() {
+    void 유효한_이름으로_수업자_이름을_생성할_수_있다() {
         // given
         String name = "김선생";
 
@@ -24,7 +24,7 @@ class TeacherNameTest {
     }
 
     @Nested
-    @DisplayName("선생님 이름 검증")
+    @DisplayName("수업자 이름 검증")
     class Validation {
 
         @Test
@@ -35,7 +35,7 @@ class TeacherNameTest {
             // when & then
             assertThatThrownBy(() -> new TeacherName(name))
                     .isInstanceOf(TeacherDomainException.class)
-                    .hasMessage("선생님 이름이 비어있습니다.");
+                    .hasMessage("수업자 이름이 비어있습니다.");
         }
 
         @Test
@@ -46,7 +46,7 @@ class TeacherNameTest {
             // when & then
             assertThatThrownBy(() -> new TeacherName(name))
                     .isInstanceOf(TeacherDomainException.class)
-                    .hasMessage("선생님 이름이 비어있습니다.");
+                    .hasMessage("수업자 이름이 비어있습니다.");
         }
 
         @Test
@@ -57,7 +57,7 @@ class TeacherNameTest {
             // when & then
             assertThatThrownBy(() -> new TeacherName(name))
                     .isInstanceOf(TeacherDomainException.class)
-                    .hasMessageContaining("선생님 이름의 길이가 유효하지 않습니다.");
+                    .hasMessageContaining("수업자 이름의 길이가 유효하지 않습니다.");
         }
 
         @Test
