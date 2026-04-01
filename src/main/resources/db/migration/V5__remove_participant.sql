@@ -13,9 +13,9 @@ ALTER TABLE student MODIFY COLUMN user_id BIGINT NOT NULL;
 ALTER TABLE teacher MODIFY COLUMN lesson_id BIGINT NOT NULL;
 ALTER TABLE teacher MODIFY COLUMN user_id BIGINT NOT NULL;
 
--- 6. participant_id 컬럼 삭제
+-- 3. participant_id 컬럼 삭제
 ALTER TABLE student DROP COLUMN participant_id;
 ALTER TABLE teacher DROP COLUMN participant_id;
 
--- 7. participant 테이블 삭제
+-- 4. participant 테이블 삭제
 DROP TABLE IF EXISTS participant;
