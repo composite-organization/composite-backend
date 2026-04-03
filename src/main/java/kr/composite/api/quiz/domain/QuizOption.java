@@ -22,4 +22,9 @@ public class QuizOption extends BaseEntity {
 
     @Column(name = "is_correct")
     private boolean isCorrect;
+
+    public void update(String content, boolean isCorrect) {
+        this.content = content;
+        this.isCorrect = isCorrect;
+    }
 }

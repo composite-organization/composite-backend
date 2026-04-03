@@ -21,6 +21,6 @@ public enum QuizStatus {
         return Arrays.stream(values())
                 .filter(value -> value.description.equals(description))
                 .findFirst()
-                .orElseThrow(() -> QuizDomainException.unsupportedStatus(description));
+                .orElseThrow(() -> QuizWidgetDomainException.unsupportedStatus(description));
     }
 }
