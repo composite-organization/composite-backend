@@ -36,4 +36,9 @@ public class JpaQuizSubmissionRepository implements QuizSubmissionRepository {
     public void saveAll(List<QuizSubmission> submissions) {
         springDataJpaQuizSubmissionRepository.saveAll(submissions);
     }
+
+    @Override
+    public Boolean existsByQuizWidgetId(Long quizWidgetId) {
+        return springDataJpaQuizSubmissionRepository.existsByQuizWidgetId(quizWidgetId);
+    }
 }
