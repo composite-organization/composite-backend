@@ -1,12 +1,11 @@
 package kr.composite.api.lesson.ui.dto.response;
 
-import kr.composite.api.lesson.domain.Lesson;
-
 public record GetLessonResponse(
-        String lessonName
+        String lessonName,
+        String teacherName
 ) {
 
-    public static GetLessonResponse from(Lesson lesson) {
-        return new GetLessonResponse(lesson.getName().getValue());
+    public static GetLessonResponse from(String lessonName, String teacherName) {
+        return new GetLessonResponse(lessonName, teacherName);
     }
 }

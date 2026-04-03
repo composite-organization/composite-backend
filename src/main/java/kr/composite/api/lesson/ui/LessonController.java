@@ -45,7 +45,6 @@ public class LessonController implements LessonApiSpec {
             @RequestUser User user,
             @RequestBody CreateLessonRequest request
     ) {
-
         CreateLessonResponse createLessonResponse = lessonService.createLesson(user, request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(createLessonResponse);
@@ -53,11 +52,11 @@ public class LessonController implements LessonApiSpec {
 
     @Override
     @PostMapping("/lessons/me")
-    public ResponseEntity<Void> findMyLesson(
+    public ResponseEntity<Void> getMyLesson(
             HttpServletResponse response,
             @RequestBody FindMyLessonRequest request
     ) {
-        String token = lessonService.findMyLesson(request);
+        String token = lessonService.readMyLesson(request);
         credentialTranslator.inject(response, token);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();

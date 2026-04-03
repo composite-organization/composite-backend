@@ -13,13 +13,13 @@ import kr.composite.api.lesson.ui.dto.request.FindMyLessonRequest;
 import kr.composite.api.lesson.ui.dto.request.JoinLessonRequest;
 import kr.composite.api.lesson.ui.dto.response.CreateLessonResponse;
 import kr.composite.api.lesson.ui.dto.response.GetLessonResponse;
-import kr.composite.api.participant.domain.Student;
-import kr.composite.api.participant.domain.StudentName;
-import kr.composite.api.participant.domain.StudentParticipateEvent;
-import kr.composite.api.participant.domain.StudentRepository;
-import kr.composite.api.participant.domain.Teacher;
-import kr.composite.api.participant.domain.TeacherName;
-import kr.composite.api.participant.domain.TeacherRepository;
+import kr.composite.api.student.domain.Student;
+import kr.composite.api.student.domain.StudentName;
+import kr.composite.api.student.domain.StudentParticipateEvent;
+import kr.composite.api.student.domain.StudentRepository;
+import kr.composite.api.teacher.domain.Teacher;
+import kr.composite.api.teacher.domain.TeacherName;
+import kr.composite.api.teacher.domain.TeacherRepository;
 import kr.composite.api.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -43,9 +43,10 @@ public class LessonService {
                 .orElseThrow(() -> LessonApplicationException.cannotFindLesson());
         Long lessonId = lesson.getId();
 
-        if (studentRepository.findByLessonIdAndUserId(lessonId, user.getId()).isPresent()) {
+        if (studentRepository.existsByLessonIdAndUserId(lessonId, user.getId())) {
             throw LessonApplicationException.alreadyJoined();
         }
+
         StudentName studentName = new StudentName(
                 Optional.ofNullable(request.name()).orElse(user.getName().getValue())
         );
@@ -76,13 +77,13 @@ public class LessonService {
     }
 
     @Transactional(readOnly = true)
-    public String findMyLesson(FindMyLessonRequest request) {
+    public String readMyLesson(FindMyLessonRequest request) {
         LessonCode lessonCode = new LessonCode(request.lessonCode());
         Lesson lesson = lessonRepository.findByLessonCode(lessonCode)
                 .orElseThrow(() -> LessonApplicationException.cannotFindLesson());
 
         LessonPassword lessonPassword = lesson.getPassword();
-        lessonPassword.checkPassword(request.password());
+        lessonPassword.verify(request.password());
 
         Teacher teacher = teacherRepository.findByLessonId(lesson.getId())
                 .orElseThrow(() -> LessonApplicationException.cannotFindTeacher());
@@ -106,6 +107,6 @@ public class LessonService {
             throw LessonApplicationException.noPermission();
         }
 
-        return GetLessonResponse.from(lesson);
+        return GetLessonResponse.from(lesson.getName().getValue(), teacher.getName().getValue());
     }
 }

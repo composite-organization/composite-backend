@@ -91,7 +91,7 @@ class LessonPasswordTest {
             LessonPassword lessonPassword = new LessonPassword(password);
 
             // when & then
-            assertThatCode(() -> lessonPassword.checkPassword(password)).doesNotThrowAnyException();
+            assertThatCode(() -> lessonPassword.verify(password)).doesNotThrowAnyException();
         }
 
         @Test
@@ -100,7 +100,7 @@ class LessonPasswordTest {
             LessonPassword lessonPassword = new LessonPassword("password123");
 
             // when & then
-            assertThatThrownBy(() -> lessonPassword.checkPassword("wrongPassword"))
+            assertThatThrownBy(() -> lessonPassword.verify("wrongPassword"))
                     .isInstanceOf(LessonDomainException.class)
                     .hasMessage("수업 비밀번호가 일치하지 않습니다.");
         }

@@ -1,11 +1,10 @@
-package kr.composite.api.participant.infrastructure;
-
-import kr.composite.api.participant.domain.Teacher;
-import kr.composite.api.participant.domain.TeacherRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
+package kr.composite.api.teacher.infrastructure;
 
 import java.util.Optional;
+import kr.composite.api.teacher.domain.Teacher;
+import kr.composite.api.teacher.domain.TeacherRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor

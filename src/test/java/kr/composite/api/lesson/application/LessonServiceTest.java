@@ -11,11 +11,11 @@ import kr.composite.api.lesson.ui.dto.request.CreateLessonRequest;
 import kr.composite.api.lesson.ui.dto.request.FindMyLessonRequest;
 import kr.composite.api.lesson.ui.dto.request.JoinLessonRequest;
 import kr.composite.api.lesson.ui.dto.response.CreateLessonResponse;
-import kr.composite.api.participant.domain.Student;
-import kr.composite.api.participant.domain.StudentParticipateEvent;
-import kr.composite.api.participant.domain.StudentRepository;
-import kr.composite.api.participant.domain.Teacher;
-import kr.composite.api.participant.domain.TeacherRepository;
+import kr.composite.api.student.domain.Student;
+import kr.composite.api.student.domain.StudentParticipateEvent;
+import kr.composite.api.student.domain.StudentRepository;
+import kr.composite.api.teacher.domain.Teacher;
+import kr.composite.api.teacher.domain.TeacherRepository;
 import kr.composite.api.user.domain.User;
 import kr.composite.api.user.domain.UserName;
 import kr.composite.api.user.domain.UserRepository;
@@ -170,7 +170,7 @@ class LessonServiceTest {
         final FindMyLessonRequest request = new FindMyLessonRequest(findLessonCode, password);
 
         // when & then
-        assertThatCode(() -> lessonService.findMyLesson(request)).doesNotThrowAnyException();
+        assertThatCode(() -> lessonService.readMyLesson(request)).doesNotThrowAnyException();
     }
 
     @Test

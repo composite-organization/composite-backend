@@ -29,7 +29,7 @@ public interface LessonApiSpec {
     );
 
     @Operation(summary = "내 수업 찾기", description = "수업자 자신이 만든 수업을 찾습니다.")
-    ResponseEntity<Void> findMyLesson(
+    ResponseEntity<Void> getMyLesson(
             HttpServletResponse response,
             FindMyLessonRequest request
     );
