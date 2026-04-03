@@ -13,4 +13,6 @@ public interface QuizSubmissionRepository {
     Boolean existsByStudentIdAndQuizWidgetId(Long studentId, Long quizWidgetId);
 
     void saveAll(List<QuizSubmission> submissions);
+
+    Boolean existsByQuizWidgetId(Long quizWidgetId);
 }
