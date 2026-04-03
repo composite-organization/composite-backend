@@ -26,4 +26,8 @@ public class QuizWidget extends BaseEntity {
     @Column(name = "status")
     @Convert(converter = QuizStatusConverter.class)
     private QuizStatus quizStatus;
+
+    public void updateStatus(QuizStatus quizStatus) {
+        this.quizStatus = quizStatus;
+    }
 }
