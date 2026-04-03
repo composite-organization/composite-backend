@@ -1,4 +1,4 @@
-package kr.composite.api.participant.domain;
+package kr.composite.api.student.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Teacher extends BaseEntity {
+public class Student extends BaseEntity {
 
     @Column(name = "user_id")
     private Long userId;
@@ -22,5 +22,5 @@ public class Teacher extends BaseEntity {
     private Long lessonId;
 
     @Embedded
-    private TeacherName name;
+    private StudentName name;
 }

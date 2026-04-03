@@ -1,6 +1,6 @@
-package kr.composite.api.participant.infrastructure;
+package kr.composite.api.teacher.infrastructure;
 
-import kr.composite.api.participant.domain.Teacher;
+import kr.composite.api.teacher.domain.Teacher;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
@@ -12,4 +12,6 @@ public interface SpringDataJpaTeacherRepository extends JpaRepository<Teacher, L
     Optional<Teacher> findByUserId(Long userId);
 
     Optional<Teacher> findByLessonId(Long lessonId);
+
+    Boolean existsByLessonIdAndUserId(Long lessonId, Long userId);
 }

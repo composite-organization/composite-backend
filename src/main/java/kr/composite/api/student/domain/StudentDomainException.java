@@ -1,4 +1,4 @@
-package kr.composite.api.participant.domain;
+package kr.composite.api.student.domain;
 
 import kr.composite.api.exception.domain.BusinessException;
 

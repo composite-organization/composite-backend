@@ -1,4 +1,4 @@
-package kr.composite.api.participant.domain;
+package kr.composite.api.teacher.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
