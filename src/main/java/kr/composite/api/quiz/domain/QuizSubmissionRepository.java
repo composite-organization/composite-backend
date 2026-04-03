@@ -11,4 +11,6 @@ public interface QuizSubmissionRepository {
     Long countByQuizWidgetIdAndQuizOptionIdIn(Long quizWidgetId, List<Long> quizOptionIds);
 
     Boolean existsByStudentIdAndQuizWidgetId(Long studentId, Long quizWidgetId);
+
+    void saveAll(List<QuizSubmission> submissions);
 }
