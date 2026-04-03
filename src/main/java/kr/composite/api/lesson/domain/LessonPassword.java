@@ -33,8 +33,8 @@ public class LessonPassword {
         }
     }
 
-    public void checkPassword(String password) {
-        if (this.value.equals(password)) {
+    public void verify(String password) {
+        if (value.equals(password)) {
             return;
         }
         throw LessonDomainException.invalidPassword();
