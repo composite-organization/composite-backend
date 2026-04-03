@@ -81,7 +81,7 @@ public class QuizWidgetController implements QuizWidgetApiSpec {
             @RequestUser User user,
             @PathVariable("quizWidgetId") Long quizWidgetId
     ) {
-        quizWidgetService.deleteQuizWidget(quizWidgetId);
+        quizWidgetService.deleteQuizWidget(user, quizWidgetId);
 
         return ResponseEntity.noContent().build();
     }

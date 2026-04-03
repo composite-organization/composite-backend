@@ -13,8 +13,8 @@ import kr.composite.api.quiz.domain.QuizSubmissionRepository;
 import kr.composite.api.quiz.domain.QuizTitle;
 import kr.composite.api.quiz.domain.QuizWidget;
 import kr.composite.api.quiz.domain.QuizWidgetRepository;
-import kr.composite.api.quiz.ui.dto.request.SubmitQuizSubmissionRequest;
 import kr.composite.api.quiz.ui.dto.request.CreateQuizWidgetRequest;
+import kr.composite.api.quiz.ui.dto.request.SubmitQuizSubmissionRequest;
 import kr.composite.api.quiz.ui.dto.request.UpdateQuizOptionRequest;
 import kr.composite.api.quiz.ui.dto.request.UpdateQuizOptionRequest.QuizOptionRequest;
 import kr.composite.api.quiz.ui.dto.request.UpdateQuizWidgetStatusRequest;
@@ -136,7 +136,7 @@ class QuizWidgetServiceTest {
         quizOptionRepository.save(new QuizOption(quizWidget.getId(), "옵션", true));
 
         // when
-        quizWidgetService.deleteQuizWidget(quizWidget.getId());
+        quizWidgetService.deleteQuizWidget(user, quizWidget.getId());
 
         // then
         assertThat(quizWidgetRepository.findById(quizWidget.getId())).isEmpty();
