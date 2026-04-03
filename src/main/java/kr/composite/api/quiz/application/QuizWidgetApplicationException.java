@@ -14,7 +14,7 @@ public class QuizWidgetApplicationException extends BusinessException {
         super(code, message, detail, category);
     }
 
-    public static QuizWidgetApplicationException cannotFindQuizWidget() {
+    public static QuizWidgetApplicationException quizWidgetNotFound() {
         return new QuizWidgetApplicationException(
                 generateCode(1),
                 "퀴즈 위젯을 찾을 수 없습니다.",
@@ -22,7 +22,7 @@ public class QuizWidgetApplicationException extends BusinessException {
         );
     }
 
-    public static QuizWidgetApplicationException cannotFindQuizOption() {
+    public static QuizWidgetApplicationException quizOptionNotFound() {
         return new QuizWidgetApplicationException(
                 generateCode(2),
                 "퀴즈 옵션을 찾을 수 없습니다.",
@@ -30,7 +30,7 @@ public class QuizWidgetApplicationException extends BusinessException {
         );
     }
 
-    public static QuizWidgetApplicationException cannotUpdateQuizOption() {
+    public static QuizWidgetApplicationException alreadyQuizSubmitted() {
         return new QuizWidgetApplicationException(
                 generateCode(3),
                 "이미 제출된 퀴즈는 수정할 수 없습니다.",
@@ -38,7 +38,7 @@ public class QuizWidgetApplicationException extends BusinessException {
         );
     }
 
-    public static QuizWidgetApplicationException invalidQuizStatus() {
+    public static QuizWidgetApplicationException notInProgress() {
         return new QuizWidgetApplicationException(
                 generateCode(4),
                 "퀴즈가 진행 중인 경우에만 제출할 수 있습니다.",
