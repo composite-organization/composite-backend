@@ -46,21 +46,19 @@ public class QuizWidgetService {
         QuizWidget quizWidget = new QuizWidget(widget.getId(), quizTitle);
         quizWidgetRepository.save(quizWidget);
 
+        Long quizWidgetId = quizWidget.getId();
         List<QuizOption> quizOptions = request.options().stream()
-                .map(option -> new QuizOption(quizWidget.getId(), option.content(), option.isCorrect()))
+                .map(option -> new QuizOption(quizWidgetId, option.content(), option.isCorrect()))
                 .toList();
-
         quizOptionRepository.saveAll(quizOptions);
 
-        CreateQuizWidgetResponse createQuizWidgetResponse = CreateQuizWidgetResponse.from(quizWidget.getId());
-
-        return createQuizWidgetResponse;
+        return CreateQuizWidgetResponse.from(quizWidgetId);
     }
 
     @Transactional(readOnly = true)
     public GetQuizWidgetResponse readQuizWidget(User user, Long quizWidgetId) {
         QuizWidget quizWidget = quizWidgetRepository.findById(quizWidgetId)
-                .orElseThrow(() -> QuizWidgetApplicationException.quizWidgetNotFound());
+                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
 
         List<QuizOption> quizOptions = quizOptionRepository.findAllByQuizWidgetId(quizWidgetId);
 
@@ -70,10 +68,8 @@ public class QuizWidgetService {
     @Transactional
     public void updateQuizWidgetStatus(User user, Long quizWidgetId, UpdateQuizWidgetStatusRequest request) {
         QuizWidget quizWidget = quizWidgetRepository.findById(quizWidgetId)
-                .orElseThrow(() -> QuizWidgetApplicationException.quizWidgetNotFound());
-
-        QuizStatus newStatus = QuizStatus.fromDescription(request.status());
-        quizWidget.updateStatus(newStatus);
+                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
+        quizWidget.updateStatus(QuizStatus.fromDescription(request.status()));
 
         quizWidgetRepository.save(quizWidget);
     }
@@ -87,7 +83,7 @@ public class QuizWidgetService {
     @Transactional
     public void submitQuizSubmission(User user, Long quizWidgetId, SubmitQuizSubmissionRequest request) {
         QuizWidget quizWidget = quizWidgetRepository.findById(quizWidgetId)
-                .orElseThrow(() -> QuizWidgetApplicationException.quizWidgetNotFound());
+                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
 
         if (!quizWidget.getQuizStatus().equals(QuizStatus.IN_PROGRESS)) {
             throw QuizWidgetApplicationException.notInProgress();
@@ -109,17 +105,14 @@ public class QuizWidgetService {
     @Transactional(readOnly = true)
     public GetQuizResultResponse getQuizResult(User user, Long quizWidgetId) {
         quizWidgetRepository.findById(quizWidgetId)
-                .orElseThrow(() -> QuizWidgetApplicationException.quizWidgetNotFound());
+                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
 
         Long totalSubmissions = quizSubmissionRepository.countByQuizWidgetId(quizWidgetId);
         if (totalSubmissions == 0) {
             return GetQuizResultResponse.from(0);
         }
 
-        List<QuizOption> correctOptions = quizOptionRepository.findAllByQuizWidgetIdAndIsCorrectTrue(quizWidgetId);
-        List<Long> correctOptionIds = correctOptions.stream()
-                .map(QuizOption::getId)
-                .toList();
+        List<Long> correctOptionIds = readQuizAnswer(quizWidgetId).answerQuizOptionIds();
 
         if (correctOptionIds.isEmpty()) {
             return GetQuizResultResponse.from(0);
@@ -182,8 +175,6 @@ public class QuizWidgetService {
             }
         }
 
-        UpdateQuizOptionResponse updateQuizOptionResponse = UpdateQuizOptionResponse.from(quizWidgetId);
-
-        return updateQuizOptionResponse;
+        return UpdateQuizOptionResponse.from(quizWidgetId);
     }
 }
