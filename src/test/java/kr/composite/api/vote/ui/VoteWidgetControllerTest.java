@@ -112,8 +112,8 @@ class VoteWidgetControllerTest {
                     .then()
                     .statusCode(200)
                     .body("status", equalTo("IN_PROGRESS"))
-                    .body("data.anonymousOptionStatuses", hasSize(2))
-                    .body("data.totalParticipantCount", equalTo(0));
+                    .body("participationResponse.anonymousOptionStatuses", hasSize(2))
+                    .body("participationResponse.totalParticipantCount", equalTo(0));
         }
 
         @Test
@@ -129,8 +129,8 @@ class VoteWidgetControllerTest {
                     .then()
                     .statusCode(200)
                     .body("status", equalTo("ENDED"))
-                    .body("data.options", hasSize(2))
-                    .body("data.selectedOptionIds", notNullValue());
+                    .body("endedResponse.optionResults", hasSize(2))
+                    .body("endedResponse.optionResults.isSelected", notNullValue());
         }
 
         @Test
