@@ -31,6 +31,14 @@ class ParticipantDomainException extends BusinessException {
         );
     }
 
+    public static ParticipantDomainException participantNotFound() {
+        return new ParticipantDomainException(
+                generateCode(3),
+                "참여자 정보를 찾을 수 없습니다.",
+                Category.NOT_FOUND
+        );
+    }
+
     private static String generateCode(int number) {
         return CODE_PREFIX + String.format("%03d", number);
     }
