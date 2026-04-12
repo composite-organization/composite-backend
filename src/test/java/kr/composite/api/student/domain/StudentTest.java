@@ -1,10 +1,8 @@
-package kr.composite.api.participant.domain;
+package kr.composite.api.student.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import kr.composite.api.student.domain.Student;
-import kr.composite.api.student.domain.StudentName;
 import org.junit.jupiter.api.Test;
 
 class StudentTest {

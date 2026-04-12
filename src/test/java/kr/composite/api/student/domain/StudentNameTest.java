@@ -1,11 +1,9 @@
-package kr.composite.api.participant.domain;
+package kr.composite.api.student.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import kr.composite.api.student.domain.StudentDomainException;
-import kr.composite.api.student.domain.StudentName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
