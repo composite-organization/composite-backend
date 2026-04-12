@@ -133,7 +133,7 @@ public class VoteWidgetService {
         }
         Students students = new Students(studentRepository.findAllByIdIn(voteSubmissions.getDistinctStudentIds()));
 
-        return VoteInProgressData.identified(voteOptions, voteSubmissions, students.toParticipatedStudents());
+        return VoteInProgressData.identified(voteOptions, voteSubmissions, students);
     }
 
     private VoteEndedData buildEndedData(Long voteWidgetId, List<VoteOption> voteOptions) {

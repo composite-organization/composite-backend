@@ -1,6 +1,8 @@
 package kr.composite.api.student.domain;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Students {
 
@@ -10,9 +12,8 @@ public class Students {
         this.students = List.copyOf(students);
     }
 
-    public List<ParticipatedStudent> toParticipatedStudents() {
+    public Map<Long, String> nameByStudentId() {
         return students.stream()
-                .map(ParticipatedStudent::new)
-                .toList();
+                .collect(Collectors.toMap(Student::getId, student -> student.getName().getValue()));
     }
 }
