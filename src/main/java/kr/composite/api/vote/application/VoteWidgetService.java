@@ -131,7 +131,7 @@ public class VoteWidgetService {
         if (voteWidget.isAnonymous()) {
             return VoteInProgressData.anonymous(voteOptions, voteSubmissions);
         }
-        Students students = new Students(studentRepository.findAllByIdIn(voteSubmissions.getDistinctStudentIds()));
+        Students students = studentRepository.findAllByIdIn(voteSubmissions.getDistinctStudentIds());
 
         return VoteInProgressData.identified(voteOptions, voteSubmissions, students);
     }

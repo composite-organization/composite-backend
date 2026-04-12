@@ -1,9 +1,9 @@
 package kr.composite.api.student.infrastructure;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import kr.composite.api.student.domain.Student;
+import kr.composite.api.student.domain.Students;
 import kr.composite.api.student.domain.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -35,7 +35,7 @@ public class JpaStudentRepository implements StudentRepository {
     }
 
     @Override
-    public List<Student> findAllByIdIn(Collection<Long> ids) {
-        return springDataJpaStudentRepository.findAllByIdIn(ids);
+    public Students findAllByIdIn(Collection<Long> ids) {
+        return new Students(springDataJpaStudentRepository.findAllByIdIn(ids));
     }
 }

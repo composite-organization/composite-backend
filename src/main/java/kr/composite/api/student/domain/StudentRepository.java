@@ -1,7 +1,6 @@
 package kr.composite.api.student.domain;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 public interface StudentRepository {
@@ -14,5 +13,5 @@ public interface StudentRepository {
 
     Boolean existsByLessonIdAndUserId(Long lessonId, Long userId);
 
-    List<Student> findAllByIdIn(Collection<Long> ids);
+    Students findAllByIdIn(Collection<Long> ids);
 }
