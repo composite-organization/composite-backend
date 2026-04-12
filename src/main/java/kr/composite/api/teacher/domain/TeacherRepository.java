@@ -11,4 +11,6 @@ public interface TeacherRepository {
     Optional<Teacher> findByUserId(Long userId);
 
     Optional<Teacher> findByLessonId(Long lessonId);
+
+    boolean existsByLessonIdAndUserId(Long lessonId, Long userId);
 }

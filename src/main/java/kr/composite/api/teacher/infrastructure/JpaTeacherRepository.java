@@ -31,4 +31,9 @@ public class JpaTeacherRepository implements TeacherRepository {
     public Optional<Teacher> findByLessonId(Long lessonId) {
         return springDataJpaTeacherRepository.findByLessonId(lessonId);
     }
+
+    @Override
+    public boolean existsByLessonIdAndUserId(Long lessonId, Long userId) {
+        return springDataJpaTeacherRepository.existsByLessonIdAndUserId(lessonId, userId);
+    }
 }
