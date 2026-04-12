@@ -56,12 +56,6 @@ public interface QuizWidgetApiSpec {
             SubmitQuizSubmissionRequest request
     );
 
-    @Operation(summary = "퀴즈 결과 조회", description = "해당 퀴즈의 전체 정답률을 조회합니다.")
-    ResponseEntity<GetQuizResultResponse> getQuizResult(
-            User user,
-            @Parameter(description = "퀴즈 위젯 ID", example = "1") Long quizWidgetId
-    );
-
     @Operation(summary = "퀴즈 옵션 수정", description = "퀴즈의 선택지 문항을 수정, 추가 또는 삭제합니다. (제출자가 있을 경우 수정 불가)")
     ResponseEntity<UpdateQuizOptionResponse> updateQuizOption(
             User user,

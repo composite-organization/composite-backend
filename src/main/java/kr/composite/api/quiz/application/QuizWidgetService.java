@@ -62,7 +62,31 @@ public class QuizWidgetService {
 
         List<QuizOption> quizOptions = quizOptionRepository.findAllByQuizWidgetId(quizWidgetId);
 
-        return GetQuizWidgetResponse.of(quizWidget, quizOptions);
+        int correctRate = calculateCorrectRate(quizWidgetId);
+
+        return GetQuizWidgetResponse.of(quizWidget, quizOptions, correctRate);
+    }
+
+    private int calculateCorrectRate(Long quizWidgetId) {
+        Long totalSubmissions = quizSubmissionRepository.countByQuizWidgetId(quizWidgetId);
+        if (totalSubmissions == 0) {
+            return 0;
+        }
+
+        List<QuizOption> correctOptions = quizOptionRepository.findAllByQuizWidgetIdAndIsCorrectTrue(quizWidgetId);
+        List<Long> correctOptionIds = correctOptions.stream()
+                .map(QuizOption::getId)
+                .toList();
+
+        if (correctOptionIds.isEmpty()) {
+            return 0;
+        }
+
+        Long correctSubmissions = quizSubmissionRepository.countByQuizWidgetIdAndQuizOptionIdIn(quizWidgetId,
+                correctOptionIds);
+
+        double rawRate = (double) correctSubmissions / totalSubmissions * 100;
+        return (int) Math.round(rawRate);
     }
 
     @Transactional
@@ -100,31 +124,6 @@ public class QuizWidgetService {
                 .toList();
 
         quizSubmissionRepository.saveAll(submissions);
-    }
-
-    @Transactional(readOnly = true)
-    public GetQuizResultResponse getQuizResult(User user, Long quizWidgetId) {
-        quizWidgetRepository.findById(quizWidgetId)
-                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
-
-        Long totalSubmissions = quizSubmissionRepository.countByQuizWidgetId(quizWidgetId);
-        if (totalSubmissions == 0) {
-            return GetQuizResultResponse.from(0);
-        }
-
-        List<Long> correctOptionIds = readQuizAnswer(quizWidgetId).answerQuizOptionIds();
-
-        if (correctOptionIds.isEmpty()) {
-            return GetQuizResultResponse.from(0);
-        }
-
-        Long correctSubmissions = quizSubmissionRepository.countByQuizWidgetIdAndQuizOptionIdIn(quizWidgetId,
-                correctOptionIds);
-
-        double rawRate = (double) correctSubmissions / totalSubmissions * 100;
-        int correctRate = (int) Math.round(rawRate);
-
-        return GetQuizResultResponse.from(correctRate);
     }
 
     @Transactional(readOnly = true)

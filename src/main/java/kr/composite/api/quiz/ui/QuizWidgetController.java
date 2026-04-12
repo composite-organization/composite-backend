@@ -99,17 +99,6 @@ public class QuizWidgetController implements QuizWidgetApiSpec {
     }
 
     @Override
-    @GetMapping("quizWidgets/{quizWidgetId}/result")
-    public ResponseEntity<GetQuizResultResponse> getQuizResult(
-            @RequestUser User user,
-            @PathVariable("quizWidgetId") Long quizWidgetId
-    ) {
-        GetQuizResultResponse getQuizResultResponse = quizWidgetService.getQuizResult(user, quizWidgetId);
-
-        return ResponseEntity.ok().body(getQuizResultResponse);
-    }
-
-    @Override
     @PatchMapping("quizWidgets/{quizWidgetId}/quizOptions")
     public ResponseEntity<UpdateQuizOptionResponse> updateQuizOption(
             @RequestUser User user,

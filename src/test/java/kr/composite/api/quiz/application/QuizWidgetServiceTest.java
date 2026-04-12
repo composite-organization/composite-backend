@@ -20,7 +20,6 @@ import kr.composite.api.quiz.ui.dto.request.UpdateQuizOptionRequest.QuizOptionRe
 import kr.composite.api.quiz.ui.dto.request.UpdateQuizWidgetStatusRequest;
 import kr.composite.api.quiz.ui.dto.response.CreateQuizWidgetResponse;
 import kr.composite.api.quiz.ui.dto.response.GetQuizAnswerResponse;
-import kr.composite.api.quiz.ui.dto.response.GetQuizResultResponse;
 import kr.composite.api.quiz.ui.dto.response.GetQuizWidgetResponse;
 import kr.composite.api.user.domain.User;
 import kr.composite.api.user.domain.UserName;
@@ -91,14 +90,36 @@ class QuizWidgetServiceTest {
         // given
         Widget widget = new Widget(1L, WidgetType.QUIZ);
         widgetRepository.save(widget);
-        QuizWidget quizWidget = new QuizWidget(widget.getId(), new QuizTitle("조회 퀴즈"), QuizStatus.NOT_STARTED);
+        QuizWidget quizWidget = new QuizWidget(widget.getId(), new QuizTitle("조회 퀴즈"), QuizStatus.IN_PROGRESS);
         quizWidgetRepository.save(quizWidget);
+
+        QuizOption correctOption = new QuizOption(quizWidget.getId(), "정답", true);
+        quizOptionRepository.save(correctOption);
+        quizSubmissionRepository.save(new QuizSubmission(user.getId(), quizWidget.getId(), correctOption.getId()));
 
         // when
         GetQuizWidgetResponse response = quizWidgetService.readQuizWidget(user, quizWidget.getId());
 
         // then
         assertThat(response.title()).isEqualTo("조회 퀴즈");
+        assertThat(response.correctRate()).isEqualTo(100); // 정답률 검증 추가
+        assertThat(response.options()).hasSize(1);
+        assertThat(response.options().get(0).content()).isEqualTo("정답");
+    }
+
+    @Test
+    void 제출이_없는_퀴즈_조회_시_정답률은_0이다() {
+        // given
+        Widget widget = new Widget(1L, WidgetType.QUIZ);
+        widgetRepository.save(widget);
+        QuizWidget quizWidget = new QuizWidget(widget.getId(), new QuizTitle("제출 없는 퀴즈"), QuizStatus.IN_PROGRESS);
+        quizWidgetRepository.save(quizWidget);
+
+        // when
+        GetQuizWidgetResponse response = quizWidgetService.readQuizWidget(user, quizWidget.getId());
+
+        // then
+        assertThat(response.correctRate()).isEqualTo(0);
     }
 
     @Test
@@ -182,45 +203,6 @@ class QuizWidgetServiceTest {
         // when & then
         assertThatThrownBy(() -> quizWidgetService.submitQuizSubmission(user, quizWidget.getId(), request))
                 .isInstanceOf(QuizWidgetApplicationException.class);
-    }
-
-    @Test
-    void 퀴즈_결과를_조회할_수_있다() {
-        // given
-        Widget widget = new Widget(1L, WidgetType.QUIZ);
-        widgetRepository.save(widget);
-        QuizWidget quizWidget = new QuizWidget(widget.getId(), new QuizTitle("결과 퀴즈"), QuizStatus.ENDED);
-        quizWidgetRepository.save(quizWidget);
-        QuizOption correctOption = new QuizOption(quizWidget.getId(), "정답", true);
-        QuizOption wrongOption = new QuizOption(quizWidget.getId(), "오답", false);
-        quizOptionRepository.saveAll(List.of(correctOption, wrongOption));
-
-        quizSubmissionRepository.save(new QuizSubmission(user.getId(), quizWidget.getId(), correctOption.getId()));
-
-        User user2 = new User(new UserName("사용자2"));
-        entityManager.persist(user2);
-        quizSubmissionRepository.save(new QuizSubmission(user2.getId(), quizWidget.getId(), wrongOption.getId()));
-
-        // when
-        GetQuizResultResponse response = quizWidgetService.getQuizResult(user, quizWidget.getId());
-
-        // then
-        assertThat(response.correctRate()).isEqualTo(50);
-    }
-
-    @Test
-    void 제출이_없는_퀴즈_결과_조회_시_정답률은_0이다() {
-        // given
-        Widget widget = new Widget(1L, WidgetType.QUIZ);
-        widgetRepository.save(widget);
-        QuizWidget quizWidget = new QuizWidget(widget.getId(), new QuizTitle("결과 퀴즈 0"), QuizStatus.ENDED);
-        quizWidgetRepository.save(quizWidget);
-
-        // when
-        GetQuizResultResponse response = quizWidgetService.getQuizResult(user, quizWidget.getId());
-
-        // then
-        assertThat(response.correctRate()).isEqualTo(0);
     }
 
     @Test

@@ -16,15 +16,19 @@ public record GetQuizWidgetResponse(
         @Schema(description = "퀴즈 상태", example = "진행 중")
         String status,
 
+        @Schema(description = "정답률 (%)", example = "75") // 추가
+        int correctRate,
+
         @Schema(description = "퀴즈 선택지")
         List<QuizOptionResponse> options
 ) {
 
-    public static GetQuizWidgetResponse of(QuizWidget quizWidget, List<QuizOption> quizOptions) {
+    public static GetQuizWidgetResponse of(QuizWidget quizWidget, List<QuizOption> quizOptions, int correctRate) {
         return new GetQuizWidgetResponse(
                 quizWidget.getId(),
                 quizWidget.getTitle().getValue(),
                 quizWidget.getQuizStatus().getDescription(),
+                correctRate, // 추가
                 quizOptions.stream()
                         .map(QuizOptionResponse::from)
                         .toList()
