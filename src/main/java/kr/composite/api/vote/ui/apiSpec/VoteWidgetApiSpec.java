@@ -21,8 +21,8 @@ public interface VoteWidgetApiSpec {
     @Operation(
             summary = "투표 위젯 조회",
             description = "투표 위젯을 조회합니다. "
-                    + "participationData(선택지별 현황)는 상태와 무관하게 항상 포함됩니다. "
-                    + "ENDED 상태인 경우 endedData(선정 결과)가 추가로 포함됩니다. "
+                    + "participationResponse(선택지별 현황)는 상태와 무관하게 항상 포함됩니다. "
+                    + "ENDED 상태인 경우 endedResponse(선정 결과)가 추가로 포함됩니다. "
                     + "폴링으로 실시간 현황 및 결과를 확인할 수 있습니다."
     )
     ResponseEntity<GetVoteWidgetResponse> readVoteWidget(

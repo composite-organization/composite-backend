@@ -35,6 +35,9 @@ public class VoteWidgetService {
 
     @Transactional
     public CreateVoteWidgetResponse addVoteWidget(PostVoteWidgetRequest request) {
+        if (request.options().isEmpty()) {
+            throw VoteApplicationException.emptyOptions();
+        }
         Widget widget = new Widget(request.lessonId(), WidgetType.VOTE);
         widgetRepository.save(widget);
         VoteTitle voteTitle = new VoteTitle(request.title());
@@ -63,6 +66,7 @@ public class VoteWidgetService {
                         voteSubmissions,
                         studentRepository.findAllByIdIn(voteSubmissions.getDistinctStudentIds())
                 );
+
         return GetVoteWidgetResponse.of(voteWidget, voteSubmissions, participationResponse);
     }
 
