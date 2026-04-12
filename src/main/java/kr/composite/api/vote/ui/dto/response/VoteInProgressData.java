@@ -43,13 +43,10 @@ public record VoteInProgressData(
             VoteSubmissions voteSubmissions,
             Students students
     ) {
-        Map<Long, StudentName> studentNameMap = students.nameByStudentId().entrySet().stream()
-                .collect(Collectors.toMap(entry -> entry.getKey().getId(), Map.Entry::getValue));
-
         Map<VoteOption, List<VoteSubmission>> submissionsByOption = voteSubmissions.groupByOptions(voteOptions);
 
         List<IdentifiedOptionStatus> identifiedOptionStatuses = voteOptions.stream()
-                .map(option -> IdentifiedOptionStatus.of(option, submissionsByOption, studentNameMap))
+                .map(option -> IdentifiedOptionStatus.of(option, submissionsByOption, students))
                 .toList();
 
         return new VoteInProgressData(voteSubmissions.countParticipants(), null, identifiedOptionStatuses);
@@ -92,7 +89,10 @@ public record VoteInProgressData(
 
         public static IdentifiedOptionStatus of(VoteOption voteOption,
                                                 Map<VoteOption, List<VoteSubmission>> submissionsByOption,
-                                                Map<Long, StudentName> studentNameMap) {
+                                                Students students) {
+            Map<Long, StudentName> studentNameMap = students.nameByStudentId().entrySet().stream()
+                    .collect(Collectors.toMap(entry -> entry.getKey().getId(), Map.Entry::getValue));
+
             List<String> voterNames = submissionsByOption.getOrDefault(voteOption, List.of()).stream()
                     .map(submission -> {
                         StudentName name = studentNameMap.get(submission.getStudentId());
