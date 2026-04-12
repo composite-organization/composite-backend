@@ -17,7 +17,6 @@ import kr.composite.api.quiz.ui.dto.request.UpdateQuizOptionRequest.QuizOptionRe
 import kr.composite.api.quiz.ui.dto.request.UpdateQuizWidgetStatusRequest;
 import kr.composite.api.quiz.ui.dto.response.CreateQuizWidgetResponse;
 import kr.composite.api.quiz.ui.dto.response.GetQuizAnswerResponse;
-import kr.composite.api.quiz.ui.dto.response.GetQuizResultResponse;
 import kr.composite.api.quiz.ui.dto.response.GetQuizWidgetResponse;
 import kr.composite.api.quiz.ui.dto.response.UpdateQuizOptionResponse;
 import kr.composite.api.user.domain.User;
@@ -73,10 +72,7 @@ public class QuizWidgetService {
             return 0;
         }
 
-        List<QuizOption> correctOptions = quizOptionRepository.findAllByQuizWidgetIdAndIsCorrectTrue(quizWidgetId);
-        List<Long> correctOptionIds = correctOptions.stream()
-                .map(QuizOption::getId)
-                .toList();
+        List<Long> correctOptionIds = readQuizAnswer(quizWidgetId).answerQuizOptionIds();
 
         if (correctOptionIds.isEmpty()) {
             return 0;
