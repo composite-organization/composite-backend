@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import kr.composite.api.student.domain.StudentName;
 import kr.composite.api.student.domain.Students;
 import kr.composite.api.vote.domain.VoteOption;
 import kr.composite.api.vote.domain.VoteSubmission;
@@ -42,11 +43,8 @@ public record VoteInProgressData(
             VoteSubmissions voteSubmissions,
             Students students
     ) {
-        Map<Long, String> studentNameMap = students.nameByStudentId().entrySet().stream()
-                .collect(Collectors.toMap(
-                        entry -> entry.getKey().getId(),
-                        entry -> entry.getValue().getValue()
-                ));
+        Map<Long, StudentName> studentNameMap = students.nameByStudentId().entrySet().stream()
+                .collect(Collectors.toMap(entry -> entry.getKey().getId(), Map.Entry::getValue));
 
         Map<VoteOption, List<VoteSubmission>> submissionsByOption = voteSubmissions.groupByOptions(voteOptions);
 
@@ -94,9 +92,12 @@ public record VoteInProgressData(
 
         public static IdentifiedOptionStatus of(VoteOption voteOption,
                                                 Map<VoteOption, List<VoteSubmission>> submissionsByOption,
-                                                Map<Long, String> studentNameMap) {
+                                                Map<Long, StudentName> studentNameMap) {
             List<String> voterNames = submissionsByOption.getOrDefault(voteOption, List.of()).stream()
-                    .map(submission -> studentNameMap.getOrDefault(submission.getStudentId(), "알 수 없음"))
+                    .map(submission -> {
+                        StudentName name = studentNameMap.get(submission.getStudentId());
+                        return name != null ? name.getValue() : "알 수 없음";
+                    })
                     .toList();
 
             return new IdentifiedOptionStatus(
