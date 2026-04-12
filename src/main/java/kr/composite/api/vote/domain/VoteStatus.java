@@ -28,8 +28,6 @@ public enum VoteStatus {
         this.description = description;
     }
 
-    public abstract VoteStatus transitionTo(VoteStatus target);
-
     public static VoteStatus from(String name) {
         if (name == null) {
             throw VoteDomainException.unsupportedStatus("null");
@@ -47,4 +45,6 @@ public enum VoteStatus {
                 .findFirst()
                 .orElseThrow(() -> VoteDomainException.unsupportedStatus(description));
     }
+
+    public abstract VoteStatus transitionTo(VoteStatus target);
 }
