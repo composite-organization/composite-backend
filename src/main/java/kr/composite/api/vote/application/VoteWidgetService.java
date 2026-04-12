@@ -1,11 +1,8 @@
 package kr.composite.api.vote.application;
 
 import java.util.List;
-import kr.composite.api.participant.domain.ParticipantRepository;
-import kr.composite.api.participant.domain.ParticipatedStudent;
-import kr.composite.api.participant.domain.Participants;
-import kr.composite.api.participant.domain.StudentRepository;
-import kr.composite.api.participant.domain.Students;
+import kr.composite.api.student.domain.StudentRepository;
+import kr.composite.api.student.domain.Students;
 import kr.composite.api.vote.domain.VoteOption;
 import kr.composite.api.vote.domain.VoteOptionContent;
 import kr.composite.api.vote.domain.VoteOptionRepository;
@@ -39,7 +36,6 @@ public class VoteWidgetService {
     private final VoteSubmissionRepository voteSubmissionRepository;
     private final WidgetRepository widgetRepository;
     private final StudentRepository studentRepository;
-    private final ParticipantRepository participantRepository;
 
     @Transactional
     public CreateVoteWidgetResponse addVoteWidget(PostVoteWidgetRequest request) {
@@ -136,9 +132,8 @@ public class VoteWidgetService {
             return VoteInProgressData.anonymous(voteOptions, voteSubmissions);
         }
         Students students = new Students(studentRepository.findAllByIdIn(voteSubmissions.getDistinctStudentIds()));
-        Participants participants = new Participants(participantRepository.findAllByIdIn(students.participantIds()));
 
-        return VoteInProgressData.identified(voteOptions, voteSubmissions, students.pairWithParticipants(participants));
+        return VoteInProgressData.identified(voteOptions, voteSubmissions, students.toParticipatedStudents());
     }
 
     private VoteEndedData buildEndedData(Long voteWidgetId, List<VoteOption> voteOptions) {

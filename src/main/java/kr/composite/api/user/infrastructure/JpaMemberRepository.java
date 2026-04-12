@@ -1,11 +1,10 @@
 package kr.composite.api.user.infrastructure;
 
+import java.util.Optional;
 import kr.composite.api.user.domain.Member;
 import kr.composite.api.user.domain.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor

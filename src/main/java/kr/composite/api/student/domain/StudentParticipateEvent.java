@@ -1,4 +1,4 @@
-package kr.composite.api.participant.domain;
+package kr.composite.api.student.domain;
 
 public record StudentParticipateEvent(
         Student student,
