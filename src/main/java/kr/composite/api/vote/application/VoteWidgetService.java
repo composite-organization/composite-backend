@@ -1,7 +1,10 @@
 package kr.composite.api.vote.application;
 
 import java.util.List;
+import kr.composite.api.student.domain.Student;
 import kr.composite.api.student.domain.StudentRepository;
+import kr.composite.api.teacher.domain.TeacherRepository;
+import kr.composite.api.user.domain.User;
 import kr.composite.api.vote.domain.VoteOption;
 import kr.composite.api.vote.domain.VoteOptionRepository;
 import kr.composite.api.vote.domain.VoteStatus;
@@ -32,11 +35,15 @@ public class VoteWidgetService {
     private final VoteSubmissionRepository voteSubmissionRepository;
     private final WidgetRepository widgetRepository;
     private final StudentRepository studentRepository;
+    private final TeacherRepository teacherRepository;
 
     @Transactional
-    public CreateVoteWidgetResponse addVoteWidget(PostVoteWidgetRequest request) {
+    public CreateVoteWidgetResponse addVoteWidget(User user, PostVoteWidgetRequest request) {
         if (request.options().isEmpty()) {
             throw VoteApplicationException.emptyOptions();
+        }
+        if (!teacherRepository.existsByLessonIdAndUserId(request.lessonId(), user.getId())) {
+            throw VoteApplicationException.forbidden();
         }
         Widget widget = new Widget(request.lessonId(), WidgetType.VOTE);
         widgetRepository.save(widget);
@@ -53,9 +60,16 @@ public class VoteWidgetService {
         return CreateVoteWidgetResponse.of(voteWidget, voteOptions);
     }
 
-    public GetVoteWidgetResponse findVoteWidget(Long voteWidgetId) {
+    public GetVoteWidgetResponse findVoteWidget(User user, Long voteWidgetId) {
         VoteWidget voteWidget = voteWidgetRepository.findById(voteWidgetId)
                 .orElseThrow(VoteApplicationException::voteWidgetNotFound);
+        Widget widget = widgetRepository.findById(voteWidget.getWidgetId())
+                .orElseThrow(VoteApplicationException::voteWidgetNotFound);
+        boolean isTeacher = teacherRepository.findByLessonIdAndUserId(widget.getLessonId(), user.getId()).isPresent();
+        boolean isStudent = studentRepository.existsByLessonIdAndUserId(widget.getLessonId(), user.getId());
+        if (!isTeacher && !isStudent) {
+            throw VoteApplicationException.forbidden();
+        }
         VoteSubmissions voteSubmissions = new VoteSubmissions(
                 voteOptionRepository.findAllByVoteWidgetId(voteWidgetId),
                 voteSubmissionRepository.findAllByVoteWidgetId(voteWidget.getId())
@@ -71,15 +85,18 @@ public class VoteWidgetService {
     }
 
     @Transactional
-    public void updateVoteStatus(Long voteWidgetId, VoteStatus voteStatus) {
+    public void updateVoteStatus(User user, Long voteWidgetId, VoteStatus voteStatus) {
         VoteWidget voteWidget = voteWidgetRepository.findById(voteWidgetId)
                 .orElseThrow(VoteApplicationException::voteWidgetNotFound);
-
+        Widget widget = widgetRepository.findById(voteWidget.getWidgetId())
+                .orElseThrow(VoteApplicationException::voteWidgetNotFound);
+        teacherRepository.findByLessonIdAndUserId(widget.getLessonId(), user.getId())
+                .orElseThrow(VoteApplicationException::forbidden);
         voteWidget.changeStatus(voteStatus);
     }
 
     @Transactional
-    public void submitVote(Long voteWidgetId, PostVoteSubmissionRequest request) {
+    public void submitVote(User user, Long voteWidgetId, PostVoteSubmissionRequest request) {
         if (request.hasEmptyOptionIds()) {
             throw VoteApplicationException.emptyOptionIds();
         }
@@ -91,24 +108,32 @@ public class VoteWidgetService {
         if (voteWidget.getVoteStatus() != VoteStatus.IN_PROGRESS) {
             throw VoteApplicationException.voteNotInProgress();
         }
+        Widget widget = widgetRepository.findById(voteWidget.getWidgetId())
+                .orElseThrow(VoteApplicationException::voteWidgetNotFound);
+        Student student = studentRepository.findByLessonIdAndUserId(widget.getLessonId(), user.getId())
+                .orElseThrow(VoteApplicationException::forbidden);
         if (!voteOptionRepository.existsAllByIdInAndVoteWidgetId(request.optionIds(), voteWidget.getId())) {
             throw VoteApplicationException.invalidOptionForVote();
         }
-        if (voteSubmissionRepository.existsByStudentIdAndVoteWidgetId(request.studentId(), voteWidget.getId())) {
+        if (voteSubmissionRepository.existsByStudentIdAndVoteWidgetId(student.getId(), voteWidget.getId())) {
             throw VoteApplicationException.alreadySubmitted();
         }
-        voteSubmissionRepository.saveAll(request.toVoteSubmissions(voteWidgetId));
+        voteSubmissionRepository.saveAll(request.toVoteSubmissions(voteWidgetId, student.getId()));
     }
 
     @Transactional
-    public void deleteVoteWidget(Long voteWidgetId) {
+    public void deleteVoteWidget(User user, Long voteWidgetId) {
         VoteWidget voteWidget = voteWidgetRepository.findById(voteWidgetId).orElse(null);
         if (voteWidget == null) {
             return;
         }
+        Widget widget = widgetRepository.findById(voteWidget.getWidgetId())
+                .orElseThrow(VoteApplicationException::voteWidgetNotFound);
+        teacherRepository.findByLessonIdAndUserId(widget.getLessonId(), user.getId())
+                .orElseThrow(VoteApplicationException::forbidden);
         voteSubmissionRepository.deleteAllByVoteWidgetId(voteWidgetId);
         voteOptionRepository.deleteAllByVoteWidgetId(voteWidgetId);
         voteWidgetRepository.deleteById(voteWidgetId);
-        widgetRepository.deleteById(voteWidget.getWidgetId());
+        widgetRepository.deleteById(widget.getId());
     }
 }

@@ -2,6 +2,8 @@ package kr.composite.api.vote.ui;
 
 import jakarta.validation.Valid;
 import java.net.URI;
+import kr.composite.api.user.domain.User;
+import kr.composite.api.user.ui.requestuser.RequestUser;
 import kr.composite.api.vote.application.VoteWidgetService;
 import kr.composite.api.vote.domain.VoteStatus;
 import kr.composite.api.vote.ui.apiSpec.VoteWidgetApiSpec;
@@ -30,9 +32,10 @@ public class VoteWidgetController implements VoteWidgetApiSpec {
     @Override
     @PostMapping("/vote-widgets")
     public ResponseEntity<CreateVoteWidgetResponse> createVoteWidget(
+            @RequestUser User user,
             @Valid @RequestBody PostVoteWidgetRequest request
     ) {
-        CreateVoteWidgetResponse response = voteWidgetService.addVoteWidget(request);
+        CreateVoteWidgetResponse response = voteWidgetService.addVoteWidget(user, request);
 
         return ResponseEntity.created(URI.create("/vote-widgets/" + response.id())).body(response);
     }
@@ -40,9 +43,10 @@ public class VoteWidgetController implements VoteWidgetApiSpec {
     @Override
     @GetMapping("/vote-widgets/{voteWidgetId}")
     public ResponseEntity<GetVoteWidgetResponse> readVoteWidget(
+            @RequestUser User user,
             @PathVariable("voteWidgetId") Long voteWidgetId
     ) {
-        GetVoteWidgetResponse response = voteWidgetService.findVoteWidget(voteWidgetId);
+        GetVoteWidgetResponse response = voteWidgetService.findVoteWidget(user, voteWidgetId);
 
         return ResponseEntity.ok().body(response);
     }
@@ -50,10 +54,11 @@ public class VoteWidgetController implements VoteWidgetApiSpec {
     @Override
     @PatchMapping("/vote-widgets/{voteWidgetId}/status")
     public ResponseEntity<Void> updateVoteStatus(
+            @RequestUser User user,
             @PathVariable("voteWidgetId") Long voteWidgetId,
             @Valid @RequestBody UpdateVoteStatusRequest request
     ) {
-        voteWidgetService.updateVoteStatus(voteWidgetId, VoteStatus.from(request.status()));
+        voteWidgetService.updateVoteStatus(user, voteWidgetId, VoteStatus.from(request.status()));
 
         return ResponseEntity.ok().build();
     }
@@ -61,10 +66,11 @@ public class VoteWidgetController implements VoteWidgetApiSpec {
     @Override
     @PostMapping("/vote-widgets/{voteWidgetId}/submissions")
     public ResponseEntity<Void> createVoteSubmission(
+            @RequestUser User user,
             @PathVariable("voteWidgetId") Long voteWidgetId,
             @Valid @RequestBody PostVoteSubmissionRequest request
     ) {
-        voteWidgetService.submitVote(voteWidgetId, request);
+        voteWidgetService.submitVote(user, voteWidgetId, request);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -72,9 +78,10 @@ public class VoteWidgetController implements VoteWidgetApiSpec {
     @Override
     @DeleteMapping("/vote-widgets/{voteWidgetId}")
     public ResponseEntity<Void> deleteVoteWidget(
+            @RequestUser User user,
             @PathVariable("voteWidgetId") Long voteWidgetId
     ) {
-        voteWidgetService.deleteVoteWidget(voteWidgetId);
+        voteWidgetService.deleteVoteWidget(user, voteWidgetId);
 
         return ResponseEntity.noContent().build();
     }

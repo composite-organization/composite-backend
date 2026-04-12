@@ -9,15 +9,11 @@ import kr.composite.api.vote.domain.VoteSubmission;
 public record PostVoteSubmissionRequest(
 
         @NotNull
-        @Schema(description = "학생 ID", example = "1")
-        Long studentId,
-
-        @NotNull
         @Schema(description = "선택한 옵션 ID 목록", example = "[1, 2]")
         List<Long> optionIds
 ) {
 
-    public List<VoteSubmission> toVoteSubmissions(Long voteWidgetId) {
+    public List<VoteSubmission> toVoteSubmissions(Long voteWidgetId, Long studentId) {
         return optionIds.stream()
                 .map(optionId -> new VoteSubmission(voteWidgetId, optionId, studentId))
                 .toList();
