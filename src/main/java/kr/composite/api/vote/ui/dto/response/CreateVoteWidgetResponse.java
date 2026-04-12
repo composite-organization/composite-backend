@@ -11,9 +11,6 @@ public record CreateVoteWidgetResponse(
         @Schema(description = "투표 위젯 ID", example = "1")
         Long id,
 
-        @Schema(description = "위젯 ID", example = "1")
-        Long widgetId,
-
         @Schema(description = "투표 안건", example = "오늘 밥 뭐 드셨나요?")
         String title,
 
@@ -37,7 +34,6 @@ public record CreateVoteWidgetResponse(
 
         return new CreateVoteWidgetResponse(
                 voteWidget.getId(),
-                voteWidget.getWidgetId(),
                 voteWidget.getVoteTitle().getValue(),
                 voteWidget.isAnonymous(),
                 voteWidget.isMultiSelectable(),
