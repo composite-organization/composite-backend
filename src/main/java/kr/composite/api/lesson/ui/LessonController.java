@@ -51,8 +51,8 @@ public class LessonController implements LessonApiSpec {
     }
 
     @Override
-    @PostMapping("/lessons/me")
-    public ResponseEntity<Void> getMyLesson(
+    @PostMapping("/lessons/authentications")
+    public ResponseEntity<Void> authenticateLesson(
             HttpServletResponse response,
             @RequestBody FindMyLessonRequest request
     ) {

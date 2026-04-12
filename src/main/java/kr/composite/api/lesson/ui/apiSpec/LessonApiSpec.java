@@ -28,8 +28,8 @@ public interface LessonApiSpec {
             CreateLessonRequest request
     );
 
-    @Operation(summary = "내 수업 찾기", description = "수업자 자신이 만든 수업을 찾습니다.")
-    ResponseEntity<Void> getMyLesson(
+    @Operation(summary = "내 수업 인증", description = "수업자 자신이 만든 수업을 인증합니다.")
+    ResponseEntity<Void> authenticateLesson(
             HttpServletResponse response,
             FindMyLessonRequest request
     );
