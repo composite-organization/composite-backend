@@ -20,9 +20,10 @@ public interface VoteWidgetApiSpec {
 
     @Operation(
             summary = "투표 위젯 조회",
-            description = "투표 위젯을 조회합니다. 상태에 따라 응답이 달라집니다. "
-                    + "IN_PROGRESS: 현황(data) 포함, ENDED: 결과(data) 포함. "
-                    + "폴링으로 실시간 현황/결과를 확인할 수 있습니다."
+            description = "투표 위젯을 조회합니다. "
+                    + "participationData(선택지별 현황)는 상태와 무관하게 항상 포함됩니다. "
+                    + "ENDED 상태인 경우 endedData(선정 결과)가 추가로 포함됩니다. "
+                    + "폴링으로 실시간 현황 및 결과를 확인할 수 있습니다."
     )
     ResponseEntity<GetVoteWidgetResponse> readVoteWidget(
             @Parameter(description = "투표 위젯 ID", example = "1")

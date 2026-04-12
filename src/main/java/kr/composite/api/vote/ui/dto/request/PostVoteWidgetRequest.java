@@ -3,6 +3,8 @@ package kr.composite.api.vote.ui.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
+import kr.composite.api.vote.domain.VoteOption;
+import kr.composite.api.vote.domain.VoteOptionContent;
 
 @Schema(description = "투표 위젯 생성 요청")
 public record PostVoteWidgetRequest(
@@ -28,4 +30,9 @@ public record PostVoteWidgetRequest(
         Boolean isMultiSelectable
 ) {
 
+    public List<VoteOption> toVoteOptions(Long voteWidgetId) {
+        return options.stream()
+                .map(optionContent -> new VoteOption(voteWidgetId, new VoteOptionContent(optionContent)))
+                .toList();
+    }
 }

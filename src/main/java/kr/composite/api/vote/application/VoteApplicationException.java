@@ -10,7 +10,7 @@ class VoteApplicationException extends BusinessException {
         super(code, message, category);
     }
 
-    static VoteApplicationException widgetNotFound() {
+    static VoteApplicationException voteWidgetNotFound() {
         return new VoteApplicationException(
                 generateCode(1),
                 "투표 위젯을 찾을 수 없습니다.",

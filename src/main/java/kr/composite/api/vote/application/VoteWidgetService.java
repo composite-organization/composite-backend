@@ -2,9 +2,7 @@ package kr.composite.api.vote.application;
 
 import java.util.List;
 import kr.composite.api.student.domain.StudentRepository;
-import kr.composite.api.student.domain.Students;
 import kr.composite.api.vote.domain.VoteOption;
-import kr.composite.api.vote.domain.VoteOptionContent;
 import kr.composite.api.vote.domain.VoteOptionRepository;
 import kr.composite.api.vote.domain.VoteStatus;
 import kr.composite.api.vote.domain.VoteSubmissionRepository;
@@ -16,9 +14,7 @@ import kr.composite.api.vote.ui.dto.request.PostVoteSubmissionRequest;
 import kr.composite.api.vote.ui.dto.request.PostVoteWidgetRequest;
 import kr.composite.api.vote.ui.dto.response.CreateVoteWidgetResponse;
 import kr.composite.api.vote.ui.dto.response.GetVoteWidgetResponse;
-import kr.composite.api.vote.ui.dto.response.VoteEndedData;
-import kr.composite.api.vote.ui.dto.response.VoteInProgressData;
-import kr.composite.api.vote.ui.dto.response.VoteStatusData;
+import kr.composite.api.vote.ui.dto.response.VoteParticipationResponse;
 import kr.composite.api.widget.domain.Widget;
 import kr.composite.api.widget.domain.WidgetRepository;
 import kr.composite.api.widget.domain.WidgetType;
@@ -39,13 +35,8 @@ public class VoteWidgetService {
 
     @Transactional
     public CreateVoteWidgetResponse addVoteWidget(PostVoteWidgetRequest request) {
-        if (request.options().isEmpty()) {
-            throw VoteApplicationException.emptyOptions();
-        }
-
         Widget widget = new Widget(request.lessonId(), WidgetType.VOTE);
         widgetRepository.save(widget);
-
         VoteTitle voteTitle = new VoteTitle(request.title());
         VoteWidget voteWidget = new VoteWidget(
                 widget.getId(),
@@ -54,60 +45,53 @@ public class VoteWidgetService {
                 request.isMultiSelectable()
         );
         voteWidgetRepository.save(voteWidget);
+        List<VoteOption> voteOptions = voteOptionRepository.saveAll(request.toVoteOptions(voteWidget.getId()));
 
-        List<VoteOption> voteOptions = request.options().stream()
-                .map(optionContent -> new VoteOption(voteWidget.getId(), new VoteOptionContent(optionContent)))
-                .toList();
-        List<VoteOption> savedOptions = voteOptionRepository.saveAll(voteOptions);
-
-        return CreateVoteWidgetResponse.of(voteWidget, savedOptions);
+        return CreateVoteWidgetResponse.of(voteWidget, voteOptions);
     }
 
     public GetVoteWidgetResponse findVoteWidget(Long voteWidgetId) {
         VoteWidget voteWidget = voteWidgetRepository.findById(voteWidgetId)
-                .orElseThrow(VoteApplicationException::widgetNotFound);
-
-        List<VoteOption> voteOptions = voteOptionRepository.findAllByVoteWidgetId(voteWidgetId);
-
-        VoteStatusData data = switch (voteWidget.getVoteStatus()) {
-            case IN_PROGRESS -> buildInProgressData(voteWidget, voteOptions);
-            case ENDED -> buildEndedData(voteWidgetId, voteOptions);
-        };
-
-        return GetVoteWidgetResponse.of(voteWidget, voteOptions, data);
+                .orElseThrow(VoteApplicationException::voteWidgetNotFound);
+        VoteSubmissions voteSubmissions = new VoteSubmissions(
+                voteOptionRepository.findAllByVoteWidgetId(voteWidgetId),
+                voteSubmissionRepository.findAllByVoteWidgetId(voteWidget.getId())
+        );
+        VoteParticipationResponse participationResponse = voteWidget.isAnonymous()
+                ? VoteParticipationResponse.anonymous(voteSubmissions)
+                : VoteParticipationResponse.identified(
+                        voteSubmissions,
+                        studentRepository.findAllByIdIn(voteSubmissions.getDistinctStudentIds())
+                );
+        return GetVoteWidgetResponse.of(voteWidget, voteSubmissions, participationResponse);
     }
 
     @Transactional
     public void updateVoteStatus(Long voteWidgetId, VoteStatus voteStatus) {
         VoteWidget voteWidget = voteWidgetRepository.findById(voteWidgetId)
-                .orElseThrow(VoteApplicationException::widgetNotFound);
+                .orElseThrow(VoteApplicationException::voteWidgetNotFound);
 
         voteWidget.changeStatus(voteStatus);
     }
 
     @Transactional
     public void submitVote(Long voteWidgetId, PostVoteSubmissionRequest request) {
-        VoteWidget voteWidget = voteWidgetRepository.findById(voteWidgetId)
-                .orElseThrow(VoteApplicationException::widgetNotFound);
-
-        if (voteWidget.getVoteStatus() != VoteStatus.IN_PROGRESS) {
-            throw VoteApplicationException.voteNotInProgress();
-        }
-
         if (request.hasEmptyOptionIds()) {
             throw VoteApplicationException.emptyOptionIds();
         }
-
+        VoteWidget voteWidget = voteWidgetRepository.findById(voteWidgetId)
+                .orElseThrow(VoteApplicationException::voteWidgetNotFound);
         if (!voteWidget.isMultiSelectable() && request.hasMultipleOptionIds()) {
             throw VoteApplicationException.multipleOptionsNotAllowed();
         }
-
-        if (voteSubmissionRepository.existsByStudentIdAndVoteWidgetId(request.studentId(), voteWidgetId)) {
-            throw VoteApplicationException.alreadySubmitted();
+        if (voteWidget.getVoteStatus() != VoteStatus.IN_PROGRESS) {
+            throw VoteApplicationException.voteNotInProgress();
         }
-
-        if (!voteOptionRepository.existsAllByIdInAndVoteWidgetId(request.optionIds(), voteWidgetId)) {
+        if (!voteOptionRepository.existsAllByIdInAndVoteWidgetId(request.optionIds(), voteWidget.getId())) {
             throw VoteApplicationException.invalidOptionForVote();
+        }
+        if (voteSubmissionRepository.existsByStudentIdAndVoteWidgetId(request.studentId(), voteWidget.getId())) {
+            throw VoteApplicationException.alreadySubmitted();
         }
         voteSubmissionRepository.saveAll(request.toVoteSubmissions(voteWidgetId));
     }
@@ -122,24 +106,5 @@ public class VoteWidgetService {
         voteOptionRepository.deleteAllByVoteWidgetId(voteWidgetId);
         voteWidgetRepository.deleteById(voteWidgetId);
         widgetRepository.deleteById(voteWidget.getWidgetId());
-    }
-
-    private VoteInProgressData buildInProgressData(VoteWidget voteWidget, List<VoteOption> voteOptions) {
-        VoteSubmissions voteSubmissions = new VoteSubmissions(
-                voteSubmissionRepository.findAllByVoteWidgetId(voteWidget.getId()));
-
-        if (voteWidget.isAnonymous()) {
-            return VoteInProgressData.anonymous(voteOptions, voteSubmissions);
-        }
-        Students students = studentRepository.findAllByIdIn(voteSubmissions.getDistinctStudentIds());
-
-        return VoteInProgressData.identified(voteOptions, voteSubmissions, students);
-    }
-
-    private VoteEndedData buildEndedData(Long voteWidgetId, List<VoteOption> voteOptions) {
-        VoteSubmissions voteSubmissions = new VoteSubmissions(
-                voteSubmissionRepository.findAllByVoteWidgetId(voteWidgetId));
-
-        return VoteEndedData.of(voteOptions, voteSubmissions);
     }
 }
