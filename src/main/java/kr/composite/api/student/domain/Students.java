@@ -12,8 +12,8 @@ public class Students {
         this.students = List.copyOf(students);
     }
 
-    public Map<Long, String> nameByStudentId() {
+    public Map<Student, StudentName> nameByStudentId() {
         return students.stream()
-                .collect(Collectors.toMap(Student::getId, student -> student.getName().getValue()));
+                .collect(Collectors.toMap(student -> student, Student::getName));
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import kr.composite.api.student.domain.Students;
 import kr.composite.api.vote.domain.VoteOption;
 import kr.composite.api.vote.domain.VoteSubmission;
@@ -41,7 +42,11 @@ public record VoteInProgressData(
             VoteSubmissions voteSubmissions,
             Students students
     ) {
-        Map<Long, String> studentNameMap = students.nameByStudentId();
+        Map<Long, String> studentNameMap = students.nameByStudentId().entrySet().stream()
+                .collect(Collectors.toMap(
+                        entry -> entry.getKey().getId(),
+                        entry -> entry.getValue().getValue()
+                ));
 
         Map<VoteOption, List<VoteSubmission>> submissionsByOption = voteSubmissions.groupByOptions(voteOptions);
 
