@@ -1,5 +1,6 @@
 package kr.composite.api.participant.infrastructure;
 
+import java.util.List;
 import java.util.Optional;
 import kr.composite.api.participant.domain.Participant;
 import kr.composite.api.participant.domain.ParticipantRepository;
@@ -30,5 +31,10 @@ public class JpaParticipantRepository implements ParticipantRepository {
     @Override
     public boolean existsByLessonIdAndUserId(Long lessonId, Long userId) {
         return springDataJpaParticipantRepository.existsByLessonIdAndUserId(lessonId, userId);
+    }
+
+    @Override
+    public List<Participant> findAllByIdIn(List<Long> participantIds) {
+        return springDataJpaParticipantRepository.findAllByIdIn(participantIds);
     }
 }

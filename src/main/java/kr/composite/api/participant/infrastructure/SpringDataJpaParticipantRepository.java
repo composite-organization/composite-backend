@@ -1,5 +1,6 @@
 package kr.composite.api.participant.infrastructure;
 
+import java.util.List;
 import java.util.Optional;
 import kr.composite.api.participant.domain.Participant;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,4 +12,6 @@ public interface SpringDataJpaParticipantRepository extends JpaRepository<Partic
     Optional<Participant> findByUserId(Long userId);
 
     boolean existsByLessonIdAndUserId(Long lessonId, Long userId);
+
+    List<Participant> findAllByIdIn(List<Long> participantIds);
 }
