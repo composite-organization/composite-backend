@@ -81,7 +81,7 @@ public class VoteWidgetController implements VoteWidgetApiSpec {
             @RequestUser User user,
             @PathVariable("voteWidgetId") Long voteWidgetId
     ) {
-        voteWidgetService.deleteVoteWidget(user, voteWidgetId);
+        voteWidgetService.removeVoteWidget(user, voteWidgetId);
 
         return ResponseEntity.noContent().build();
     }
