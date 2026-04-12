@@ -7,4 +7,5 @@ public record JoinLessonRequest(
         @Schema(description = "참여자 이름 (null일 경우 사용자 이름 사용)", example = "홍길동")
         String name
 ) {
+
 }

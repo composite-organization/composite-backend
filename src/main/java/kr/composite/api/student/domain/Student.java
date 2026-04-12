@@ -1,21 +1,26 @@
-package kr.composite.api.participant.domain;
+package kr.composite.api.student.domain;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import kr.composite.api.global.domain.BaseEntity;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Student extends BaseEntity {
 
-    @Column(name = "participant_id")
-    private Long participantId;
+    @Column(name = "user_id")
+    private Long userId;
 
-    public Student(Long participantId) {
-        this.participantId = participantId;
-    }
+    @Column(name = "lesson_id")
+    private Long lessonId;
+
+    @Embedded
+    private StudentName name;
 }
