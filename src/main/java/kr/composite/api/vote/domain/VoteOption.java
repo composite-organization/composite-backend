@@ -1,6 +1,7 @@
 package kr.composite.api.vote.domain;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import kr.composite.api.global.domain.BaseEntity;
 import lombok.AccessLevel;
@@ -17,6 +18,6 @@ public class VoteOption extends BaseEntity {
     @Column(name = "vote_widget_id")
     private Long voteWidgetId;
 
-    @Column(name = "content")
-    private String content;
+    @Embedded
+    private VoteOptionContent content;
 }
