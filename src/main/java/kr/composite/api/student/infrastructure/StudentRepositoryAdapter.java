@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class JpaStudentRepository implements StudentRepository {
+public class StudentRepositoryAdapter implements StudentRepository {
 
     private final SpringDataJpaStudentRepository springDataJpaStudentRepository;
 

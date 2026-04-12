@@ -6,7 +6,7 @@ import java.util.Optional;
 import kr.composite.api.student.domain.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface SpringDataJpaStudentRepository extends JpaRepository<Student, Long> {
+interface SpringDataJpaStudentRepository extends JpaRepository<Student, Long> {
 
     Optional<Student> findByLessonIdAndUserId(Long lessonId, Long userId);
 

@@ -2,7 +2,7 @@ package kr.composite.api.student.domain;
 
 import kr.composite.api.exception.domain.BusinessException;
 
-public class StudentDomainException extends BusinessException {
+class StudentDomainException extends BusinessException {
 
     private static final String CODE_PREFIX = "STUDENT_DOMAIN_";
 
