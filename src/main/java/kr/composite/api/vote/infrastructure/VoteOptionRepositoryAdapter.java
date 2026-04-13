@@ -1,6 +1,5 @@
 package kr.composite.api.vote.infrastructure;
 
-import java.util.Collection;
 import java.util.List;
 import kr.composite.api.vote.domain.VoteOption;
 import kr.composite.api.vote.domain.VoteOptionRepository;
@@ -24,7 +23,7 @@ public class VoteOptionRepositoryAdapter implements VoteOptionRepository {
     }
 
     @Override
-    public boolean existsAllByIdInAndVoteWidgetId(Collection<Long> ids, Long voteWidgetId) {
+    public boolean existsAllByIdInAndVoteWidgetId(List<Long> ids, Long voteWidgetId) {
         return jpaVoteOptionRepository.countByIdInAndVoteWidgetId(ids, voteWidgetId) == ids.size();
     }
 
