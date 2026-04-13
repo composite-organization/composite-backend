@@ -9,7 +9,7 @@ import kr.composite.api.vote.domain.VoteSubmission;
 public record PostVoteSubmissionRequest(
 
         @NotNull
-        @Schema(description = "선택한 옵션 ID 목록", example = "[1, 2]")
+        @Schema(description = "선택한 선택지 ID 목록", example = "[1, 2]")
         List<Long> optionIds
 ) {
 
