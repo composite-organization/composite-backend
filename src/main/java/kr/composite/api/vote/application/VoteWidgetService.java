@@ -42,7 +42,7 @@ public class VoteWidgetService {
         if (request.options().isEmpty()) {
             throw VoteApplicationException.emptyOptions();
         }
-        if (!teacherRepository.existsByLessonIdAndUserId(request.lessonId(), user.getId())) {
+        if (!isTeacherOfLesson(user, request.lessonId())) {
             throw VoteApplicationException.forbidden();
         }
         Widget widget = new Widget(request.lessonId(), WidgetType.VOTE);
@@ -65,9 +65,7 @@ public class VoteWidgetService {
                 .orElseThrow(VoteApplicationException::voteWidgetNotFound);
         Widget widget = widgetRepository.findById(voteWidget.getWidgetId())
                 .orElseThrow(VoteApplicationException::voteWidgetNotFound);
-        boolean isTeacher = teacherRepository.findByLessonIdAndUserId(widget.getLessonId(), user.getId()).isPresent();
-        boolean isStudent = studentRepository.existsByLessonIdAndUserId(widget.getLessonId(), user.getId());
-        if (!isTeacher && !isStudent) {
+        if (!isTeacherOfLesson(user, widget.getLessonId()) && !isStudentOfLesson(user, widget.getLessonId())) {
             throw VoteApplicationException.forbidden();
         }
         VoteSubmissions voteSubmissions = new VoteSubmissions(
@@ -90,8 +88,9 @@ public class VoteWidgetService {
                 .orElseThrow(VoteApplicationException::voteWidgetNotFound);
         Widget widget = widgetRepository.findById(voteWidget.getWidgetId())
                 .orElseThrow(VoteApplicationException::voteWidgetNotFound);
-        teacherRepository.findByLessonIdAndUserId(widget.getLessonId(), user.getId())
-                .orElseThrow(VoteApplicationException::forbidden);
+        if (!isTeacherOfLesson(user, widget.getLessonId())) {
+            throw VoteApplicationException.forbidden();
+        }
         voteWidget.changeStatus(voteStatus);
     }
 
@@ -129,11 +128,20 @@ public class VoteWidgetService {
         }
         Widget widget = widgetRepository.findById(voteWidget.getWidgetId())
                 .orElseThrow(VoteApplicationException::voteWidgetNotFound);
-        teacherRepository.findByLessonIdAndUserId(widget.getLessonId(), user.getId())
-                .orElseThrow(VoteApplicationException::forbidden);
+        if (!isTeacherOfLesson(user, widget.getLessonId())) {
+            throw VoteApplicationException.forbidden();
+        }
         voteSubmissionRepository.deleteAllByVoteWidgetId(voteWidgetId);
         voteOptionRepository.deleteAllByVoteWidgetId(voteWidgetId);
         voteWidgetRepository.deleteById(voteWidgetId);
         widgetRepository.deleteById(widget.getId());
+    }
+
+    private boolean isTeacherOfLesson(User user, Long lessonId) {
+        return teacherRepository.existsByLessonIdAndUserId(lessonId, user.getId());
+    }
+
+    private boolean isStudentOfLesson(User user, Long lessonId) {
+        return studentRepository.existsByLessonIdAndUserId(lessonId, user.getId());
     }
 }
