@@ -65,8 +65,11 @@ public record VoteParticipationResponse(
 
         private static final StudentName UNKNOWN_STUDENTNAME = new StudentName("알 수 없는 사용자");
 
-        public static IdentifiedOptionStatus of(VoteOption voteOption, VoteSubmissions voteSubmissions,
-                                                Students students) {
+        public static IdentifiedOptionStatus of(
+                VoteOption voteOption,
+                VoteSubmissions voteSubmissions,
+                Students students
+        ) {
             List<String> voterNames = voteSubmissions.getSubmissions(voteOption).stream()
                     .map(submission -> findStudentName(students, submission.getStudentId()))
                     .map(StudentName::getValue)
