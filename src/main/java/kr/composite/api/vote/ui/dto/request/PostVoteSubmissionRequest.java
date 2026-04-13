@@ -15,7 +15,7 @@ public record PostVoteSubmissionRequest(
 
     public List<VoteSubmission> toVoteSubmissions(Long voteWidgetId, Long studentId) {
         return optionIds.stream()
-                .map(optionId -> new VoteSubmission(voteWidgetId, optionId, studentId))
+                .map(optionId -> new VoteSubmission(studentId, voteWidgetId, optionId))
                 .toList();
     }
 
