@@ -19,7 +19,7 @@ public class VoteSubmissions {
                         .collect(Collectors.toMap(
                                 option -> option,
                                 option -> List.copyOf(submissionsByOptionId.getOrDefault(option.getId(), List.of())),
-                                (a, b) -> a,
+                                (existing, duplicate) -> existing,
                                 LinkedHashMap::new
                         ))
         );
