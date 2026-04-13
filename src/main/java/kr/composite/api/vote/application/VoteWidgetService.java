@@ -121,7 +121,7 @@ public class VoteWidgetService {
     }
 
     @Transactional
-    public void removeVoteWidget(User user, Long voteWidgetId) {
+    public void deleteVoteWidget(User user, Long voteWidgetId) {
         VoteWidget voteWidget = voteWidgetRepository.findById(voteWidgetId).orElse(null);
         if (voteWidget == null) {
             return;
