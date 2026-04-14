@@ -46,7 +46,7 @@ public class VoteWidgetController implements VoteWidgetApiSpec {
             @RequestUser User user,
             @PathVariable("voteWidgetId") Long voteWidgetId
     ) {
-        GetVoteWidgetResponse response = voteWidgetService.readVoteWidget(user, voteWidgetId);
+        GetVoteWidgetResponse response = voteWidgetService.getVoteWidget(user, voteWidgetId);
 
         return ResponseEntity.ok().body(response);
     }

@@ -60,7 +60,7 @@ public class VoteWidgetService {
         return CreateVoteWidgetResponse.of(voteWidget, voteOptions);
     }
 
-    public GetVoteWidgetResponse readVoteWidget(User user, Long voteWidgetId) {
+    public GetVoteWidgetResponse getVoteWidget(User user, Long voteWidgetId) {
         VoteWidget voteWidget = voteWidgetRepository.findById(voteWidgetId)
                 .orElseThrow(VoteApplicationException::voteWidgetNotFound);
         Widget widget = widgetRepository.findById(voteWidget.getWidgetId())
