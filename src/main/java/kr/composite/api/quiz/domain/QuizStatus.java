@@ -1,8 +1,7 @@
 package kr.composite.api.quiz.domain;
 
-import lombok.Getter;
-
 import java.util.Arrays;
+import lombok.Getter;
 
 @Getter
 public enum QuizStatus {

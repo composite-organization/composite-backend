@@ -103,7 +103,7 @@ public class QuizWidgetController implements QuizWidgetApiSpec {
             @RequestUser User user,
             @RequestBody UpdateQuizOptionRequest request
     ) {
-        UpdateQuizOptionResponse updateQuizOptionResponse = quizWidgetService.updateQuizOption(user,request);
+        UpdateQuizOptionResponse updateQuizOptionResponse = quizWidgetService.updateQuizOption(user, request);
 
         return ResponseEntity.ok().body(updateQuizOptionResponse);
     }

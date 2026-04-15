@@ -9,7 +9,6 @@ import kr.composite.api.quiz.ui.dto.request.UpdateQuizOptionRequest;
 import kr.composite.api.quiz.ui.dto.request.UpdateQuizWidgetStatusRequest;
 import kr.composite.api.quiz.ui.dto.response.CreateQuizWidgetResponse;
 import kr.composite.api.quiz.ui.dto.response.GetQuizAnswerResponse;
-import kr.composite.api.quiz.ui.dto.response.GetQuizResultResponse;
 import kr.composite.api.quiz.ui.dto.response.GetQuizWidgetResponse;
 import kr.composite.api.quiz.ui.dto.response.UpdateQuizOptionResponse;
 import kr.composite.api.user.domain.User;
