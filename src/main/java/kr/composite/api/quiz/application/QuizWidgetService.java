@@ -19,6 +19,9 @@ import kr.composite.api.quiz.ui.dto.response.CreateQuizWidgetResponse;
 import kr.composite.api.quiz.ui.dto.response.GetQuizAnswerResponse;
 import kr.composite.api.quiz.ui.dto.response.GetQuizWidgetResponse;
 import kr.composite.api.quiz.ui.dto.response.UpdateQuizOptionResponse;
+import kr.composite.api.student.domain.Student;
+import kr.composite.api.student.domain.StudentRepository;
+import kr.composite.api.teacher.domain.TeacherRepository;
 import kr.composite.api.user.domain.User;
 import kr.composite.api.widget.domain.Widget;
 import kr.composite.api.widget.domain.WidgetRepository;
@@ -35,11 +38,17 @@ public class QuizWidgetService {
     private final WidgetRepository widgetRepository;
     private final QuizOptionRepository quizOptionRepository;
     private final QuizSubmissionRepository quizSubmissionRepository;
+    private final TeacherRepository teacherRepository;
+    private final StudentRepository studentRepository;
 
     @Transactional
     public CreateQuizWidgetResponse addQuizWidget(User user, CreateQuizWidgetRequest request) {
         Widget widget = new Widget(request.lessonId(), WidgetType.QUIZ);
         widgetRepository.save(widget);
+
+        if (!isTeacherOfLesson(user.getId(), request.lessonId())) {
+            throw QuizWidgetApplicationException.forbidden();
+        }
 
         QuizTitle quizTitle = new QuizTitle(request.title());
         QuizWidget quizWidget = new QuizWidget(widget.getId(), quizTitle);
@@ -54,25 +63,34 @@ public class QuizWidgetService {
         return CreateQuizWidgetResponse.from(quizWidgetId);
     }
 
+
     @Transactional(readOnly = true)
     public GetQuizWidgetResponse readQuizWidget(User user, Long quizWidgetId) {
         QuizWidget quizWidget = quizWidgetRepository.findById(quizWidgetId)
                 .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
 
+        Widget widget = widgetRepository.findById(quizWidget.getWidgetId())
+                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
+
+        if (!isTeacherOfLesson(user.getId(), widget.getLessonId()) && !isStudentOfLesson(user.getId(),
+                widget.getLessonId())) {
+            throw QuizWidgetApplicationException.forbidden();
+        }
+
         List<QuizOption> quizOptions = quizOptionRepository.findAllByQuizWidgetId(quizWidgetId);
 
-        int correctRate = calculateCorrectRate(quizWidgetId);
+        int correctRate = calculateCorrectRate(user, quizWidgetId);
 
         return GetQuizWidgetResponse.of(quizWidget, quizOptions, correctRate);
     }
 
-    private int calculateCorrectRate(Long quizWidgetId) {
+    private int calculateCorrectRate(User user, Long quizWidgetId) {
         Long totalSubmissions = quizSubmissionRepository.countByQuizWidgetId(quizWidgetId);
         if (totalSubmissions == 0) {
             return 0;
         }
 
-        List<Long> correctOptionIds = readQuizAnswer(quizWidgetId).answerQuizOptionIds();
+        List<Long> correctOptionIds = readQuizAnswer(user, quizWidgetId).answerQuizOptionIds();
 
         if (correctOptionIds.isEmpty()) {
             return 0;
@@ -91,11 +109,29 @@ public class QuizWidgetService {
                 .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
         quizWidget.updateStatus(QuizStatus.fromDescription(request.status()));
 
+        Widget widget = widgetRepository.findById(quizWidget.getWidgetId())
+                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
+
+        if (!isTeacherOfLesson(user.getId(), widget.getLessonId())) {
+            throw QuizWidgetApplicationException.forbidden();
+        }
+
         quizWidgetRepository.save(quizWidget);
     }
 
     @Transactional
     public void deleteQuizWidget(User user, Long quizWidgetId) {
+        QuizWidget quizWidget = quizWidgetRepository.findById(quizWidgetId)
+                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
+
+        Widget widget = widgetRepository.findById(quizWidget.getWidgetId())
+                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
+
+        if (!isTeacherOfLesson(user.getId(), widget.getLessonId())) {
+            throw QuizWidgetApplicationException.forbidden();
+        }
+
+        quizSubmissionRepository.deleteAllByQuizWidgetId(quizWidgetId);
         quizOptionRepository.deleteAllByQuizWidgetId(quizWidgetId);
         quizWidgetRepository.deleteById(quizWidgetId);
     }
@@ -109,22 +145,42 @@ public class QuizWidgetService {
             throw QuizWidgetApplicationException.notInProgress();
         }
 
-        //TODO: user.getId -> student.getId
-        if (quizSubmissionRepository.existsByStudentIdAndQuizWidgetId(user.getId(), quizWidgetId)) {
+        Widget widget = widgetRepository.findById(quizWidget.getWidgetId())
+                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
+
+        if (!isTeacherOfLesson(user.getId(), widget.getLessonId()) && !isStudentOfLesson(user.getId(),
+                widget.getLessonId())) {
+            throw QuizWidgetApplicationException.forbidden();
+        }
+
+        Student student = studentRepository.findByUserId(user.getId())
+                .orElseThrow(QuizWidgetApplicationException::forbidden);
+
+        if (quizSubmissionRepository.existsByStudentIdAndQuizWidgetId(student.getId(), quizWidgetId)) {
             throw QuizWidgetApplicationException.alreadySubmitted();
         }
 
-        // TODO: studentId 관련 추가 작업 필요 현재 user.id 를 주입 중
         List<QuizSubmission> submissions = request.quizOptionIds().stream()
-                .map(optionId -> new QuizSubmission(user.getId(), quizWidgetId, optionId))
+                .map(optionId -> new QuizSubmission(student.getId(), quizWidgetId, optionId))
                 .toList();
 
         quizSubmissionRepository.saveAll(submissions);
     }
 
     @Transactional(readOnly = true)
-    public GetQuizAnswerResponse readQuizAnswer(Long quizWidgetId) {
+    public GetQuizAnswerResponse readQuizAnswer(User user, Long quizWidgetId) {
         List<QuizOption> quizOptions = quizOptionRepository.findAllByQuizWidgetIdAndIsCorrectTrue(quizWidgetId);
+
+        QuizWidget quizWidget = quizWidgetRepository.findById(quizWidgetId)
+                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
+
+        Widget widget = widgetRepository.findById(quizWidget.getWidgetId())
+                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
+
+        if (!isTeacherOfLesson(user.getId(), widget.getLessonId()) && !isStudentOfLesson(user.getId(),
+                widget.getLessonId())) {
+            throw QuizWidgetApplicationException.forbidden();
+        }
 
         List<Long> correctOptionIds = quizOptions.stream()
                 .map(QuizOption::getId)
@@ -134,11 +190,21 @@ public class QuizWidgetService {
     }
 
     @Transactional
-    public UpdateQuizOptionResponse updateQuizOption(UpdateQuizOptionRequest request) {
+    public UpdateQuizOptionResponse updateQuizOption(User user, UpdateQuizOptionRequest request) {
         Long quizWidgetId = request.quizWidgetId();
 
         if (quizSubmissionRepository.existsByQuizWidgetId(quizWidgetId)) {
             throw QuizWidgetApplicationException.alreadyQuizSubmitted();
+        }
+
+        QuizWidget quizWidget = quizWidgetRepository.findById(quizWidgetId)
+                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
+
+        Widget widget = widgetRepository.findById(quizWidget.getWidgetId())
+                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
+
+        if (!isTeacherOfLesson(user.getId(), widget.getLessonId())) {
+            throw QuizWidgetApplicationException.forbidden();
         }
 
         List<QuizOption> existingOptions = quizOptionRepository.findAllByQuizWidgetId(quizWidgetId);
@@ -171,5 +237,13 @@ public class QuizWidgetService {
         }
 
         return UpdateQuizOptionResponse.from(quizWidgetId);
+    }
+
+    private boolean isTeacherOfLesson(Long userId, Long lessonId) {
+        return teacherRepository.existsByLessonIdAndUserId(lessonId, userId);
+    }
+
+    private boolean isStudentOfLesson(Long userId, Long lessonId) {
+        return studentRepository.existsByLessonIdAndUserId(lessonId, userId);
     }
 }

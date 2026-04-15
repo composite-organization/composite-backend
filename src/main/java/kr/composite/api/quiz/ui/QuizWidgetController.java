@@ -8,7 +8,6 @@ import kr.composite.api.quiz.ui.dto.request.UpdateQuizOptionRequest;
 import kr.composite.api.quiz.ui.dto.request.UpdateQuizWidgetStatusRequest;
 import kr.composite.api.quiz.ui.dto.response.CreateQuizWidgetResponse;
 import kr.composite.api.quiz.ui.dto.response.GetQuizAnswerResponse;
-import kr.composite.api.quiz.ui.dto.response.GetQuizResultResponse;
 import kr.composite.api.quiz.ui.dto.response.GetQuizWidgetResponse;
 import kr.composite.api.quiz.ui.dto.response.UpdateQuizOptionResponse;
 import kr.composite.api.user.domain.User;
@@ -58,7 +57,7 @@ public class QuizWidgetController implements QuizWidgetApiSpec {
             @RequestUser User user,
             @PathVariable("quizWidgetId") Long quizWidgetId
     ) {
-        GetQuizAnswerResponse getQuizAnswerResponse = quizWidgetService.readQuizAnswer(quizWidgetId);
+        GetQuizAnswerResponse getQuizAnswerResponse = quizWidgetService.readQuizAnswer(user, quizWidgetId);
 
         return ResponseEntity.ok().body(getQuizAnswerResponse);
     }
@@ -104,7 +103,7 @@ public class QuizWidgetController implements QuizWidgetApiSpec {
             @RequestUser User user,
             @RequestBody UpdateQuizOptionRequest request
     ) {
-        UpdateQuizOptionResponse updateQuizOptionResponse = quizWidgetService.updateQuizOption(request);
+        UpdateQuizOptionResponse updateQuizOptionResponse = quizWidgetService.updateQuizOption(user,request);
 
         return ResponseEntity.ok().body(updateQuizOptionResponse);
     }

@@ -41,4 +41,9 @@ public class JpaQuizSubmissionRepository implements QuizSubmissionRepository {
     public Boolean existsByQuizWidgetId(Long quizWidgetId) {
         return springDataJpaQuizSubmissionRepository.existsByQuizWidgetId(quizWidgetId);
     }
+
+    @Override
+    public void deleteAllByQuizWidgetId(Long quizWidgetId) {
+        springDataJpaQuizSubmissionRepository.deleteAllByQuizWidgetId(quizWidgetId);
+    }
 }

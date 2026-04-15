@@ -54,7 +54,16 @@ public class QuizWidgetApplicationException extends BusinessException {
         );
     }
 
+    public static QuizWidgetApplicationException forbidden() {
+        return new QuizWidgetApplicationException(
+                generateCode(6),
+                "접근 권한이 없습니다.",
+                Category.FORBIDDEN
+        );
+    }
+
     private static String generateCode(int number) {
         return CODE_PREFIX + String.format("%03d", number);
     }
+
 }
