@@ -21,11 +21,15 @@ import kr.composite.api.quiz.ui.dto.request.UpdateQuizWidgetStatusRequest;
 import kr.composite.api.quiz.ui.dto.response.CreateQuizWidgetResponse;
 import kr.composite.api.quiz.ui.dto.response.GetQuizAnswerResponse;
 import kr.composite.api.quiz.ui.dto.response.GetQuizWidgetResponse;
+import kr.composite.api.student.domain.Student;
+import kr.composite.api.student.domain.StudentName;
+import kr.composite.api.teacher.domain.Teacher;
+import kr.composite.api.teacher.domain.TeacherName;
 import kr.composite.api.user.domain.User;
 import kr.composite.api.user.domain.UserName;
 import kr.composite.api.widget.domain.Widget;
 import kr.composite.api.widget.domain.WidgetType;
-import kr.composite.api.widget.infrastructure.JpaWidgetRepository;
+import kr.composite.api.widget.domain.WidgetRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +47,7 @@ class QuizWidgetServiceTest {
     private QuizWidgetService quizWidgetService;
 
     @Autowired
-    private JpaWidgetRepository widgetRepository;
+    private WidgetRepository widgetRepository;
 
     @Autowired
     private QuizWidgetRepository quizWidgetRepository;
@@ -60,6 +64,10 @@ class QuizWidgetServiceTest {
     void setUp() {
         user = new User(new UserName("사용자"));
         entityManager.persist(user);
+
+        Teacher teacher = new Teacher(user.getId(), 1L, new TeacherName("선생님"));
+        entityManager.persist(teacher);
+
         entityManager.flush();
     }
 
@@ -95,14 +103,17 @@ class QuizWidgetServiceTest {
 
         QuizOption correctOption = new QuizOption(quizWidget.getId(), "정답", true);
         quizOptionRepository.save(correctOption);
-        quizSubmissionRepository.save(new QuizSubmission(user.getId(), quizWidget.getId(), correctOption.getId()));
+
+        Student student = new Student(user.getId(), 1L, new StudentName("학생"));
+        entityManager.persist(student);
+        quizSubmissionRepository.save(new QuizSubmission(student.getId(), quizWidget.getId(), correctOption.getId()));
 
         // when
         GetQuizWidgetResponse response = quizWidgetService.readQuizWidget(user, quizWidget.getId());
 
         // then
         assertThat(response.title()).isEqualTo("조회 퀴즈");
-        assertThat(response.correctRate()).isEqualTo(100); // 정답률 검증 추가
+        assertThat(response.correctRate()).isEqualTo(100);
         assertThat(response.options()).hasSize(1);
         assertThat(response.options().get(0).content()).isEqualTo("정답");
     }
@@ -177,6 +188,10 @@ class QuizWidgetServiceTest {
         QuizOption option2 = new QuizOption(quizWidget.getId(), "정답 2", true);
         quizOptionRepository.saveAll(List.of(option1, option2));
 
+        Student student = new Student(user.getId(), 1L, new StudentName("학생"));
+        entityManager.persist(student);
+        entityManager.flush();
+
         SubmitQuizSubmissionRequest request = new SubmitQuizSubmissionRequest(
                 List.of(option1.getId(), option2.getId())
         );
@@ -198,6 +213,10 @@ class QuizWidgetServiceTest {
         QuizOption option = new QuizOption(quizWidget.getId(), "옵션", true);
         quizOptionRepository.save(option);
 
+        Student student = new Student(user.getId(), 1L, new StudentName("학생"));
+        entityManager.persist(student);
+        entityManager.flush();
+
         SubmitQuizSubmissionRequest request = new SubmitQuizSubmissionRequest(List.of(option.getId()));
 
         // when & then
@@ -216,7 +235,7 @@ class QuizWidgetServiceTest {
         quizOptionRepository.save(correctOption);
 
         // when
-        GetQuizAnswerResponse response = quizWidgetService.readQuizAnswer(quizWidget.getId());
+        GetQuizAnswerResponse response = quizWidgetService.readQuizAnswer(user, quizWidget.getId());
 
         // then
         assertThat(response.answerQuizOptionIds()).containsExactly(correctOption.getId());
@@ -247,7 +266,7 @@ class QuizWidgetServiceTest {
         );
 
         // when
-        quizWidgetService.updateQuizOption(request);
+        quizWidgetService.updateQuizOption(user, request);
 
         // then
         List<QuizOption> options = quizOptionRepository.findAllByQuizWidgetId(quizWidget.getId());
@@ -282,7 +301,9 @@ class QuizWidgetServiceTest {
         QuizOption option = new QuizOption(quizWidget.getId(), "옵션", true);
         quizOptionRepository.save(option);
 
-        QuizSubmission submission = new QuizSubmission(user.getId(), quizWidget.getId(), option.getId());
+        Student student = new Student(user.getId(), 1L, new StudentName("학생"));
+        entityManager.persist(student);
+        QuizSubmission submission = new QuizSubmission(student.getId(), quizWidget.getId(), option.getId());
         quizSubmissionRepository.save(submission);
 
         entityManager.flush();
@@ -294,7 +315,7 @@ class QuizWidgetServiceTest {
         );
 
         // when & then
-        assertThatThrownBy(() -> quizWidgetService.updateQuizOption(request))
+        assertThatThrownBy(() -> quizWidgetService.updateQuizOption(user, request))
                 .isInstanceOf(QuizWidgetApplicationException.class);
     }
 }
