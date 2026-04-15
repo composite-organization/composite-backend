@@ -64,6 +64,14 @@ class LessonDomainException extends BusinessException {
         );
     }
 
+    public static LessonDomainException invalidPassword() {
+        return new LessonDomainException(
+                generateCode(7),
+                "수업 비밀번호가 일치하지 않습니다.",
+                Category.VALIDATION
+        );
+    }
+
     private static String generateCode(int number) {
         return CODE_PREFIX + String.format("%03d", number);
     }

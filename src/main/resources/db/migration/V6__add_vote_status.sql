@@ -1,0 +1,2 @@
+ALTER TABLE vote_widget
+    ADD COLUMN status VARCHAR(255) NOT NULL;

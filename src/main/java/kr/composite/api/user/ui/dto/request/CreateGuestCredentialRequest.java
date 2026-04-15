@@ -9,4 +9,5 @@ public record CreateGuestCredentialRequest(
         @Schema(description = "게스트 이름", example = "홍길동")
         String name
 ) {
+
 }

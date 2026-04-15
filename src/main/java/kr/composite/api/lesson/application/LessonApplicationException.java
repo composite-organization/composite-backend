@@ -22,6 +22,30 @@ class LessonApplicationException extends BusinessException {
         );
     }
 
+    public static LessonApplicationException cannotFindTeacher() {
+        return new LessonApplicationException(
+                generateCode(2),
+                "수업자를 찾을 수 없습니다.",
+                Category.NOT_FOUND
+        );
+    }
+
+    public static LessonApplicationException noPermission() {
+        return new LessonApplicationException(
+                generateCode(3),
+                "수업 접근 권한이 없습니다.",
+                Category.UNAUTHORIZED
+        );
+    }
+
+    public static LessonApplicationException cannotFindLesson() {
+        return new LessonApplicationException(
+                generateCode(4),
+                "수업을 찾을 수 없습니다.",
+                Category.NOT_FOUND
+        );
+    }
+
     private static String generateCode(int number) {
         return CODE_PREFIX + String.format("%03d", number);
     }
