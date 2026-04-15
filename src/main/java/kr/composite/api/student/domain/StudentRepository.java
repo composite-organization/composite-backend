@@ -1,5 +1,6 @@
 package kr.composite.api.student.domain;
 
+import java.util.Collection;
 import java.util.Optional;
 
 public interface StudentRepository {
@@ -11,4 +12,6 @@ public interface StudentRepository {
     Optional<Student> findByUserId(Long userId);
 
     Boolean existsByLessonIdAndUserId(Long lessonId, Long userId);
+
+    Students findAllByIdIn(Collection<Long> ids);
 }

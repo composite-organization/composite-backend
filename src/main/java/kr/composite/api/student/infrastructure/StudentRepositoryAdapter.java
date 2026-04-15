@@ -1,14 +1,16 @@
 package kr.composite.api.student.infrastructure;
 
+import java.util.Collection;
 import java.util.Optional;
 import kr.composite.api.student.domain.Student;
+import kr.composite.api.student.domain.Students;
 import kr.composite.api.student.domain.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class JpaStudentRepository implements StudentRepository {
+public class StudentRepositoryAdapter implements StudentRepository {
 
     private final SpringDataJpaStudentRepository springDataJpaStudentRepository;
 
@@ -30,5 +32,10 @@ public class JpaStudentRepository implements StudentRepository {
     @Override
     public Boolean existsByLessonIdAndUserId(Long lessonId, Long userId) {
         return springDataJpaStudentRepository.existsByLessonIdAndUserId(lessonId, userId);
+    }
+
+    @Override
+    public Students findAllByIdIn(Collection<Long> ids) {
+        return new Students(springDataJpaStudentRepository.findAllByIdIn(ids));
     }
 }
