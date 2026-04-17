@@ -18,9 +18,11 @@ import kr.composite.api.quiz.ui.dto.request.UpdateQuizWidgetStatusRequest;
 import kr.composite.api.quiz.ui.dto.response.CreateQuizWidgetResponse;
 import kr.composite.api.quiz.ui.dto.response.GetQuizAnswerResponse;
 import kr.composite.api.quiz.ui.dto.response.GetQuizWidgetResponse;
+import kr.composite.api.quiz.ui.dto.response.QuizParticipationResponse;
 import kr.composite.api.quiz.ui.dto.response.UpdateQuizOptionResponse;
 import kr.composite.api.student.domain.Student;
 import kr.composite.api.student.domain.StudentRepository;
+import kr.composite.api.student.domain.Students;
 import kr.composite.api.teacher.domain.TeacherRepository;
 import kr.composite.api.user.domain.User;
 import kr.composite.api.widget.domain.Widget;
@@ -96,7 +98,20 @@ public class QuizWidgetService {
                     .toList();
         }
 
-        return GetQuizWidgetResponse.of(quizWidget, quizOptions, correctRate, submittedOptionIds);
+        List<QuizSubmission> allSubmissions = quizSubmissionRepository.findAllByQuizWidgetId(quizWidgetId);
+        List<Long> studentIds = allSubmissions.stream()
+                .map(QuizSubmission::getStudentId)
+                .distinct()
+                .toList();
+        Students students = studentRepository.findAllByIdIn(studentIds);
+
+        QuizParticipationResponse participationResponse = QuizParticipationResponse.of(
+                quizOptions,
+                allSubmissions,
+                students
+        );
+
+        return GetQuizWidgetResponse.of(quizWidget, quizOptions, correctRate, submittedOptionIds, participationResponse);
     }
 
     private int calculateCorrectRate(User user, Long quizWidgetId) {
