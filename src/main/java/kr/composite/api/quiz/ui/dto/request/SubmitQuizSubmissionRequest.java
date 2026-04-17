@@ -3,7 +3,6 @@ package kr.composite.api.quiz.ui.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
-
 import kr.composite.api.quiz.domain.QuizSubmission;
 
 @Schema(description = "퀴즈 선택지 제출 요청")

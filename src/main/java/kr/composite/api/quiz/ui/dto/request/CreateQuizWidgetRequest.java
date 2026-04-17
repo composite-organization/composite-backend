@@ -3,7 +3,6 @@ package kr.composite.api.quiz.ui.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
-
 import kr.composite.api.quiz.domain.QuizOption;
 
 @Schema(description = "퀴즈 위젯 생성 요청")
