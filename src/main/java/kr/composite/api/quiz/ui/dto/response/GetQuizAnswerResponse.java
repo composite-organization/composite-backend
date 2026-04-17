@@ -2,6 +2,7 @@ package kr.composite.api.quiz.ui.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
+import kr.composite.api.quiz.domain.QuizOption;
 
 @Schema(description = "퀴즈 정답 조회 응답")
 public record GetQuizAnswerResponse(
@@ -9,7 +10,12 @@ public record GetQuizAnswerResponse(
         List<Long> answerQuizOptionIds
 ) {
 
-    public static GetQuizAnswerResponse from(List<Long> ids) {
-        return new GetQuizAnswerResponse(ids);
+    public static GetQuizAnswerResponse from(List<QuizOption> answerQuizOptions) {
+        List<Long> answerQuizOptionIds = answerQuizOptions
+                .stream()
+                .map(quizOption -> quizOption.getId())
+                .toList();
+
+        return new GetQuizAnswerResponse(answerQuizOptionIds);
     }
 }

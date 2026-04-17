@@ -142,12 +142,11 @@ public class QuizWidgetService {
 
         validateAccess(user.getId(), widget.getLessonId());
 
-        QuizSubmissions quizSubmissions = new QuizSubmissions(
-                quizOptionRepository.findAllByQuizWidgetId(quizWidgetId),
-                List.of()
-        );
+        List<QuizOption> answerQuizOptions = quizOptionRepository.findAllByQuizWidgetId(quizWidgetId)
+                .stream().filter(quizOption -> quizOption.isCorrect())
+                .toList();
 
-        return GetQuizAnswerResponse.from(quizSubmissions.getCorrectOptionIds());
+        return GetQuizAnswerResponse.from(answerQuizOptions);
     }
 
     @Transactional
