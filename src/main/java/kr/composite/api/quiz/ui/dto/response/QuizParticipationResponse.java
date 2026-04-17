@@ -41,6 +41,7 @@ public record QuizParticipationResponse(
             @Schema(description = "해당 선택지를 선택한 학생 이름 목록")
             List<String> participantNames
     ) {
+
         private static final StudentName UNKNOWN_STUDENTNAME = new StudentName("알 수 없는 사용자");
 
         public static QuizOptionStatus of(

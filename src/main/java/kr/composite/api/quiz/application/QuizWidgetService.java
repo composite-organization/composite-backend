@@ -52,7 +52,6 @@ public class QuizWidgetService {
         Widget widget = new Widget(request.lessonId(), WidgetType.QUIZ);
         widgetRepository.save(widget);
 
-
         QuizTitle quizTitle = new QuizTitle(request.title());
         QuizWidget quizWidget = new QuizWidget(widget.getId(), quizTitle);
         quizWidgetRepository.save(quizWidget);
@@ -111,7 +110,8 @@ public class QuizWidgetService {
                 students
         );
 
-        return GetQuizWidgetResponse.of(quizWidget, quizOptions, correctRate, submittedOptionIds, participationResponse);
+        return GetQuizWidgetResponse.of(quizWidget, quizOptions, correctRate, submittedOptionIds,
+                participationResponse);
     }
 
     private int calculateCorrectRate(User user, Long quizWidgetId) {
