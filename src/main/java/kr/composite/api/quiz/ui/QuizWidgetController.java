@@ -42,22 +42,22 @@ public class QuizWidgetController implements QuizWidgetApiSpec {
 
     @Override
     @GetMapping("quizWidgets/{quizWidgetId}")
-    public ResponseEntity<GetQuizWidgetResponse> getQuizWidget(
+    public ResponseEntity<GetQuizWidgetResponse> readQuizWidget(
             @RequestUser User user,
             @PathVariable("quizWidgetId") Long quizWidgetId
     ) {
-        GetQuizWidgetResponse getQuizWidgetResponse = quizWidgetService.readQuizWidget(user, quizWidgetId);
+        GetQuizWidgetResponse getQuizWidgetResponse = quizWidgetService.getQuizWidget(user, quizWidgetId);
 
         return ResponseEntity.ok().body(getQuizWidgetResponse);
     }
 
     @Override
     @GetMapping("quizWidgets/{quizWidgetId}/answers")
-    public ResponseEntity<GetQuizAnswerResponse> getQuizAnswer(
+    public ResponseEntity<GetQuizAnswerResponse> readQuizAnswer(
             @RequestUser User user,
             @PathVariable("quizWidgetId") Long quizWidgetId
     ) {
-        GetQuizAnswerResponse getQuizAnswerResponse = quizWidgetService.readQuizAnswer(user, quizWidgetId);
+        GetQuizAnswerResponse getQuizAnswerResponse = quizWidgetService.getQuizAnswer(user, quizWidgetId);
 
         return ResponseEntity.ok().body(getQuizAnswerResponse);
     }

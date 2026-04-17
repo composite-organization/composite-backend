@@ -61,9 +61,9 @@ public class QuizWidgetService {
         return CreateQuizWidgetResponse.from(quizWidget.getId());
     }
 
-    public GetQuizWidgetResponse readQuizWidget(User user, Long quizWidgetId) {
-        QuizWidget quizWidget = findQuizWidgetOrThrow(quizWidgetId);
-        Widget widget = findWidgetOrThrow(quizWidget.getWidgetId());
+    public GetQuizWidgetResponse getQuizWidget(User user, Long quizWidgetId) {
+        QuizWidget quizWidget = getQuizWidget(quizWidgetId);
+        Widget widget = getWidget(quizWidget.getWidgetId());
 
         validateAccess(user.getId(), widget.getLessonId());
 
@@ -92,8 +92,8 @@ public class QuizWidgetService {
 
     @Transactional
     public void updateQuizWidgetStatus(User user, Long quizWidgetId, UpdateQuizWidgetStatusRequest request) {
-        QuizWidget quizWidget = findQuizWidgetOrThrow(quizWidgetId);
-        Widget widget = findWidgetOrThrow(quizWidget.getWidgetId());
+        QuizWidget quizWidget = getQuizWidget(quizWidgetId);
+        Widget widget = getWidget(quizWidget.getWidgetId());
 
         if (!isTeacherOfLesson(user.getId(), widget.getLessonId())) {
             throw QuizWidgetApplicationException.forbidden();
@@ -104,8 +104,8 @@ public class QuizWidgetService {
 
     @Transactional
     public void deleteQuizWidget(User user, Long quizWidgetId) {
-        QuizWidget quizWidget = findQuizWidgetOrThrow(quizWidgetId);
-        Widget widget = findWidgetOrThrow(quizWidget.getWidgetId());
+        QuizWidget quizWidget = getQuizWidget(quizWidgetId);
+        Widget widget = getWidget(quizWidget.getWidgetId());
 
         if (!isTeacherOfLesson(user.getId(), widget.getLessonId())) {
             throw QuizWidgetApplicationException.forbidden();
@@ -119,13 +119,13 @@ public class QuizWidgetService {
 
     @Transactional
     public void submitQuizSubmission(User user, Long quizWidgetId, SubmitQuizSubmissionRequest request) {
-        QuizWidget quizWidget = findQuizWidgetOrThrow(quizWidgetId);
+        QuizWidget quizWidget = getQuizWidget(quizWidgetId);
 
         if (quizWidget.getQuizStatus() != QuizStatus.IN_PROGRESS) {
             throw QuizWidgetApplicationException.notInProgress();
         }
 
-        Widget widget = findWidgetOrThrow(quizWidget.getWidgetId());
+        Widget widget = getWidget(quizWidget.getWidgetId());
         Student student = studentRepository.findByLessonIdAndUserId(widget.getLessonId(), user.getId())
                 .orElseThrow(QuizWidgetApplicationException::forbidden);
 
@@ -136,9 +136,9 @@ public class QuizWidgetService {
         quizSubmissionRepository.saveAll(request.toQuizSubmissions(student.getId(), quizWidgetId));
     }
 
-    public GetQuizAnswerResponse readQuizAnswer(User user, Long quizWidgetId) {
-        QuizWidget quizWidget = findQuizWidgetOrThrow(quizWidgetId);
-        Widget widget = findWidgetOrThrow(quizWidget.getWidgetId());
+    public GetQuizAnswerResponse getQuizAnswer(User user, Long quizWidgetId) {
+        QuizWidget quizWidget = getQuizWidget(quizWidgetId);
+        Widget widget = getWidget(quizWidget.getWidgetId());
 
         validateAccess(user.getId(), widget.getLessonId());
 
@@ -154,22 +154,19 @@ public class QuizWidgetService {
     public UpdateQuizOptionResponse updateQuizOption(User user, UpdateQuizOptionRequest request) {
         Long quizWidgetId = request.quizWidgetId();
 
-        // 1. 검증
         validateOptionUpdate(user, quizWidgetId);
         List<QuizOption> existingOptions = quizOptionRepository.findAllByQuizWidgetId(quizWidgetId);
 
-        // 2. 삭제 처리 (요청에 없는 기존 옵션 제거)
         deleteRemovedOptions(existingOptions, request.options());
 
-        // 3. 업데이트 및 새 옵션 추가
         saveOrUpdateOptions(quizWidgetId, existingOptions, request.options());
 
         return UpdateQuizOptionResponse.from(quizWidgetId);
     }
 
     private void validateOptionUpdate(User user, Long quizWidgetId) {
-        QuizWidget quizWidget = findQuizWidgetOrThrow(quizWidgetId);
-        Widget widget = findWidgetOrThrow(quizWidget.getWidgetId());
+        QuizWidget quizWidget = getQuizWidget(quizWidgetId);
+        Widget widget = getWidget(quizWidget.getWidgetId());
 
         if (!isTeacherOfLesson(user.getId(), widget.getLessonId())) {
             throw QuizWidgetApplicationException.forbidden();
@@ -220,12 +217,12 @@ public class QuizWidgetService {
         existingOption.update(optionRequest.content(), optionRequest.isCorrect());
     }
 
-    private QuizWidget findQuizWidgetOrThrow(Long quizWidgetId) {
+    private QuizWidget getQuizWidget(Long quizWidgetId) {
         return quizWidgetRepository.findById(quizWidgetId)
                 .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
     }
 
-    private Widget findWidgetOrThrow(Long widgetId) {
+    private Widget getWidget(Long widgetId) {
         return widgetRepository.findById(widgetId)
                 .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
     }

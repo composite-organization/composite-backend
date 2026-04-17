@@ -109,7 +109,7 @@ class QuizWidgetServiceTest {
         quizSubmissionRepository.save(new QuizSubmission(student.getId(), quizWidget.getId(), correctOption.getId()));
 
         // when
-        GetQuizWidgetResponse response = quizWidgetService.readQuizWidget(user, quizWidget.getId());
+        GetQuizWidgetResponse response = quizWidgetService.getQuizWidget(user, quizWidget.getId());
 
         // then
         assertThat(response.title()).isEqualTo("조회 퀴즈");
@@ -146,7 +146,7 @@ class QuizWidgetServiceTest {
         entityManager.clear();
 
         // when
-        GetQuizWidgetResponse response = quizWidgetService.readQuizWidget(user, quizWidget.getId());
+        GetQuizWidgetResponse response = quizWidgetService.getQuizWidget(user, quizWidget.getId());
 
         // then
         assertThat(response.participationResponse().totalParticipantCount()).isEqualTo(2);
@@ -174,7 +174,7 @@ class QuizWidgetServiceTest {
         entityManager.clear();
 
         // when
-        GetQuizWidgetResponse response = quizWidgetService.readQuizWidget(user, quizWidget.getId());
+        GetQuizWidgetResponse response = quizWidgetService.getQuizWidget(user, quizWidget.getId());
 
         // then
         assertThat(response.submittedOptionIds()).containsExactly(option1.getId());
@@ -189,7 +189,7 @@ class QuizWidgetServiceTest {
         quizWidgetRepository.save(quizWidget);
 
         // when
-        GetQuizWidgetResponse response = quizWidgetService.readQuizWidget(user, quizWidget.getId());
+        GetQuizWidgetResponse response = quizWidgetService.getQuizWidget(user, quizWidget.getId());
 
         // then
         assertThat(response.correctRate()).isEqualTo(0);
@@ -198,7 +198,7 @@ class QuizWidgetServiceTest {
     @Test
     void 존재하지_않는_퀴즈_위젯_조회_시_예외가_발생한다() {
         // when & then
-        assertThatThrownBy(() -> quizWidgetService.readQuizWidget(user, 999L))
+        assertThatThrownBy(() -> quizWidgetService.getQuizWidget(user, 999L))
                 .isInstanceOf(QuizWidgetApplicationException.class);
     }
 
@@ -297,7 +297,7 @@ class QuizWidgetServiceTest {
         quizOptionRepository.save(correctOption);
 
         // when
-        GetQuizAnswerResponse response = quizWidgetService.readQuizAnswer(user, quizWidget.getId());
+        GetQuizAnswerResponse response = quizWidgetService.getQuizAnswer(user, quizWidget.getId());
 
         // then
         assertThat(response.answerQuizOptionIds()).containsExactly(correctOption.getId());

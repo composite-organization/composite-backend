@@ -24,13 +24,13 @@ public interface QuizWidgetApiSpec {
     );
 
     @Operation(summary = "퀴즈 위젯 조회", description = "퀴즈 위젯 ID로 퀴즈 정보와 옵션 목록을 조회합니다.")
-    ResponseEntity<GetQuizWidgetResponse> getQuizWidget(
+    ResponseEntity<GetQuizWidgetResponse> readQuizWidget(
             User user,
             @Parameter(description = "퀴즈 위젯 ID", example = "1") Long quizWidgetId
     );
 
     @Operation(summary = "퀴즈 정답 조회", description = "퀴즈의 정답 옵션 ID 목록을 조회합니다.")
-    ResponseEntity<GetQuizAnswerResponse> getQuizAnswer(
+    ResponseEntity<GetQuizAnswerResponse> readQuizAnswer(
             User user,
             @Parameter(description = "퀴즈 위젯 ID", example = "1") Long quizWidgetId
     );
