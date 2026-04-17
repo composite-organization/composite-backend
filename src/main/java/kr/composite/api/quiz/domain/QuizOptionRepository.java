@@ -18,6 +18,4 @@ public interface QuizOptionRepository {
     List<QuizOption> findAllByQuizWidgetIdAndIsCorrectTrue(Long quizWidgetId);
 
     void deleteAllInBatch(List<QuizOption> toDelete);
-
-    List<QuizOption> findAllById(List<Long> ids);
 }

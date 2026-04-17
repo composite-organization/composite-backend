@@ -47,9 +47,4 @@ public class JpaQuizOptionRepository implements QuizOptionRepository {
     public void deleteAllInBatch(List<QuizOption> toDelete) {
         springDataJpaQuizOptionRepository.deleteAllInBatch(toDelete);
     }
-
-    @Override
-    public List<QuizOption> findAllById(List<Long> ids) {
-        return springDataJpaQuizOptionRepository.findAllById(ids);
-    }
 }

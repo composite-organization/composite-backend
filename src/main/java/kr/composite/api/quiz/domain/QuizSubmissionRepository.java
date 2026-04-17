@@ -14,6 +14,8 @@ public interface QuizSubmissionRepository {
 
     void saveAll(List<QuizSubmission> submissions);
 
+    List<QuizSubmission> findAllByStudentIdAndQuizWidgetId(Long studentId, Long quizWidgetId);
+
     Boolean existsByQuizWidgetId(Long quizWidgetId);
 
     void deleteAllByQuizWidgetId(Long quizWidgetId);

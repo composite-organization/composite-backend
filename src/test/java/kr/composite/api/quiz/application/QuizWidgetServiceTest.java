@@ -114,8 +114,35 @@ class QuizWidgetServiceTest {
         // then
         assertThat(response.title()).isEqualTo("조회 퀴즈");
         assertThat(response.correctRate()).isEqualTo(100);
+        assertThat(response.submittedOptionIds()).containsExactly(correctOption.getId());
         assertThat(response.options()).hasSize(1);
         assertThat(response.options().get(0).content()).isEqualTo("정답");
+    }
+
+    @Test
+    void 학생은_자신이_제출한_답변을_함께_조회한다() {
+        // given
+        Widget widget = new Widget(1L, WidgetType.QUIZ);
+        widgetRepository.save(widget);
+        QuizWidget quizWidget = new QuizWidget(widget.getId(), new QuizTitle("조회 퀴즈"), QuizStatus.IN_PROGRESS);
+        quizWidgetRepository.save(quizWidget);
+
+        QuizOption option1 = new QuizOption(quizWidget.getId(), "옵션1", true);
+        QuizOption option2 = new QuizOption(quizWidget.getId(), "옵션2", false);
+        quizOptionRepository.saveAll(List.of(option1, option2));
+
+        Student student = new Student(user.getId(), 1L, new StudentName("학생"));
+        entityManager.persist(student);
+        quizSubmissionRepository.save(new QuizSubmission(student.getId(), quizWidget.getId(), option1.getId()));
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        GetQuizWidgetResponse response = quizWidgetService.readQuizWidget(user, quizWidget.getId());
+
+        // then
+        assertThat(response.submittedOptionIds()).containsExactly(option1.getId());
     }
 
     @Test

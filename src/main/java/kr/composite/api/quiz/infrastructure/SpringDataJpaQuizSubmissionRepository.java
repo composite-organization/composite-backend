@@ -12,6 +12,8 @@ public interface SpringDataJpaQuizSubmissionRepository extends JpaRepository<Qui
 
     Boolean existsByStudentIdAndQuizWidgetId(Long studentId, Long quizWidgetId);
 
+    List<QuizSubmission> findAllByStudentIdAndQuizWidgetId(Long studentId, Long quizWidgetId);
+
     Boolean existsByQuizWidgetId(Long quizWidgetId);
 
     void deleteAllByQuizWidgetId(Long quizWidgetId);

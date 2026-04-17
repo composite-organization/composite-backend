@@ -38,6 +38,11 @@ public class JpaQuizSubmissionRepository implements QuizSubmissionRepository {
     }
 
     @Override
+    public List<QuizSubmission> findAllByStudentIdAndQuizWidgetId(Long studentId, Long quizWidgetId) {
+        return springDataJpaQuizSubmissionRepository.findAllByStudentIdAndQuizWidgetId(studentId, quizWidgetId);
+    }
+
+    @Override
     public Boolean existsByQuizWidgetId(Long quizWidgetId) {
         return springDataJpaQuizSubmissionRepository.existsByQuizWidgetId(quizWidgetId);
     }

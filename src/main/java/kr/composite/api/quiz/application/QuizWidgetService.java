@@ -43,12 +43,13 @@ public class QuizWidgetService {
 
     @Transactional
     public CreateQuizWidgetResponse addQuizWidget(User user, CreateQuizWidgetRequest request) {
-        Widget widget = new Widget(request.lessonId(), WidgetType.QUIZ);
-        widgetRepository.save(widget);
-
         if (!isTeacherOfLesson(user.getId(), request.lessonId())) {
             throw QuizWidgetApplicationException.forbidden();
         }
+
+        Widget widget = new Widget(request.lessonId(), WidgetType.QUIZ);
+        widgetRepository.save(widget);
+
 
         QuizTitle quizTitle = new QuizTitle(request.title());
         QuizWidget quizWidget = new QuizWidget(widget.getId(), quizTitle);
@@ -72,8 +73,11 @@ public class QuizWidgetService {
         Widget widget = widgetRepository.findById(quizWidget.getWidgetId())
                 .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
 
-        if (!isTeacherOfLesson(user.getId(), widget.getLessonId()) && !isStudentOfLesson(user.getId(),
-                widget.getLessonId())) {
+        Long lessonId = widget.getLessonId();
+        boolean isTeacher = isTeacherOfLesson(user.getId(), lessonId);
+        boolean isStudent = isStudentOfLesson(user.getId(), lessonId);
+
+        if (!isTeacher && !isStudent) {
             throw QuizWidgetApplicationException.forbidden();
         }
 
@@ -81,7 +85,18 @@ public class QuizWidgetService {
 
         int correctRate = calculateCorrectRate(user, quizWidgetId);
 
-        return GetQuizWidgetResponse.of(quizWidget, quizOptions, correctRate);
+        List<Long> submittedOptionIds = List.of();
+        if (isStudent) {
+            Student student = studentRepository.findByLessonIdAndUserId(lessonId, user.getId())
+                    .orElseThrow(QuizWidgetApplicationException::forbidden);
+            submittedOptionIds = quizSubmissionRepository.findAllByStudentIdAndQuizWidgetId(student.getId(),
+                            quizWidgetId)
+                    .stream()
+                    .map(QuizSubmission::getQuizOptionId)
+                    .toList();
+        }
+
+        return GetQuizWidgetResponse.of(quizWidget, quizOptions, correctRate, submittedOptionIds);
     }
 
     private int calculateCorrectRate(User user, Long quizWidgetId) {
