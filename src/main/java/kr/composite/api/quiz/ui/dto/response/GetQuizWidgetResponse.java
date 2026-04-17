@@ -3,6 +3,7 @@ package kr.composite.api.quiz.ui.dto.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import kr.composite.api.quiz.domain.QuizOption;
+import kr.composite.api.quiz.domain.QuizSubmissions;
 import kr.composite.api.quiz.domain.QuizWidget;
 
 @Schema(description = "퀴즈 위젯 조회 응답")
@@ -23,23 +24,26 @@ public record GetQuizWidgetResponse(
         List<Long> submittedOptionIds,
 
         @Schema(description = "퀴즈 참여 현황 (선택지별 참여 학생 목록)")
-        QuizParticipationResponse participationResponse,
+        QuizSubmissionSummaryResponse participationResponse,
 
         @Schema(description = "퀴즈 선택지")
         List<QuizOptionResponse> options
 ) {
 
-    public static GetQuizWidgetResponse of(QuizWidget quizWidget, List<QuizOption> quizOptions, int correctRate,
-                                           List<Long> submittedOptionIds,
-                                           QuizParticipationResponse participationResponse) {
+    public static GetQuizWidgetResponse of(
+            QuizWidget quizWidget,
+            QuizSubmissions quizSubmissions,
+            List<Long> submittedOptionIds,
+            QuizSubmissionSummaryResponse participationResponse
+    ) {
         return new GetQuizWidgetResponse(
                 quizWidget.getId(),
                 quizWidget.getTitle().getValue(),
                 quizWidget.getQuizStatus().getDescription(),
-                correctRate, // 추가
+                quizSubmissions.calculateCorrectRate(),
                 submittedOptionIds,
                 participationResponse,
-                quizOptions.stream()
+                quizSubmissions.getQuizOptions().stream()
                         .map(QuizOptionResponse::from)
                         .toList()
         );

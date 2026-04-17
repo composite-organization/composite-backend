@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
+import kr.composite.api.quiz.domain.QuizOption;
+
 @Schema(description = "퀴즈 위젯 생성 요청")
 public record CreateQuizWidgetRequest(
         @NotNull
@@ -18,6 +20,12 @@ public record CreateQuizWidgetRequest(
         @Schema(description = "퀴즈 선택지")
         List<QuizOptionRequest> options
 ) {
+
+    public List<QuizOption> toQuizOptions(Long quizWidgetId) {
+        return options.stream()
+                .map(option -> new QuizOption(quizWidgetId, option.content(), option.isCorrect()))
+                .toList();
+    }
 
     public record QuizOptionRequest(
 

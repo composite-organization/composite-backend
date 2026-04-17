@@ -3,12 +3,12 @@ package kr.composite.api.quiz.ui.dto.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import kr.composite.api.quiz.domain.QuizOption;
-import kr.composite.api.quiz.domain.QuizSubmission;
+import kr.composite.api.quiz.domain.QuizSubmissions;
 import kr.composite.api.student.domain.StudentName;
 import kr.composite.api.student.domain.Students;
 
 @Schema(description = "퀴즈 참여 현황")
-public record QuizParticipationResponse(
+public record QuizSubmissionSummaryResponse(
         @Schema(description = "총 참여 인원 수", example = "10")
         long totalParticipantCount,
 
@@ -16,21 +16,15 @@ public record QuizParticipationResponse(
         List<QuizOptionStatus> optionStatuses
 ) {
 
-    public static QuizParticipationResponse of(
-            List<QuizOption> quizOptions,
-            List<QuizSubmission> quizSubmissions,
+    public static QuizSubmissionSummaryResponse of(
+            QuizSubmissions quizSubmissions,
             Students students
     ) {
-        long totalParticipantCount = quizSubmissions.stream()
-                .map(QuizSubmission::getStudentId)
-                .distinct()
-                .count();
-
-        List<QuizOptionStatus> optionStatuses = quizOptions.stream()
+        List<QuizOptionStatus> optionStatuses = quizSubmissions.getQuizOptions().stream()
                 .map(option -> QuizOptionStatus.of(option, quizSubmissions, students))
                 .toList();
 
-        return new QuizParticipationResponse(totalParticipantCount, optionStatuses);
+        return new QuizSubmissionSummaryResponse(quizSubmissions.countDistinctStudents(), optionStatuses);
     }
 
     @Schema(description = "퀴즈 선택지별 참여 현황")
@@ -46,11 +40,10 @@ public record QuizParticipationResponse(
 
         public static QuizOptionStatus of(
                 QuizOption quizOption,
-                List<QuizSubmission> quizSubmissions,
+                QuizSubmissions quizSubmissions,
                 Students students
         ) {
-            List<String> participantNames = quizSubmissions.stream()
-                    .filter(submission -> submission.getQuizOptionId().equals(quizOption.getId()))
+            List<String> participantNames = quizSubmissions.getSubmissions(quizOption).stream()
                     .map(submission -> students.findName(submission.getStudentId())
                             .orElse(UNKNOWN_STUDENTNAME)
                             .getValue())

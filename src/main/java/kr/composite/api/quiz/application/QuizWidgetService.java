@@ -5,8 +5,8 @@ import java.util.Objects;
 import kr.composite.api.quiz.domain.QuizOption;
 import kr.composite.api.quiz.domain.QuizOptionRepository;
 import kr.composite.api.quiz.domain.QuizStatus;
-import kr.composite.api.quiz.domain.QuizSubmission;
 import kr.composite.api.quiz.domain.QuizSubmissionRepository;
+import kr.composite.api.quiz.domain.QuizSubmissions;
 import kr.composite.api.quiz.domain.QuizTitle;
 import kr.composite.api.quiz.domain.QuizWidget;
 import kr.composite.api.quiz.domain.QuizWidgetRepository;
@@ -18,7 +18,7 @@ import kr.composite.api.quiz.ui.dto.request.UpdateQuizWidgetStatusRequest;
 import kr.composite.api.quiz.ui.dto.response.CreateQuizWidgetResponse;
 import kr.composite.api.quiz.ui.dto.response.GetQuizAnswerResponse;
 import kr.composite.api.quiz.ui.dto.response.GetQuizWidgetResponse;
-import kr.composite.api.quiz.ui.dto.response.QuizParticipationResponse;
+import kr.composite.api.quiz.ui.dto.response.QuizSubmissionSummaryResponse;
 import kr.composite.api.quiz.ui.dto.response.UpdateQuizOptionResponse;
 import kr.composite.api.student.domain.Student;
 import kr.composite.api.student.domain.StudentRepository;
@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class QuizWidgetService {
 
     private final QuizWidgetRepository quizWidgetRepository;
@@ -52,110 +53,59 @@ public class QuizWidgetService {
         Widget widget = new Widget(request.lessonId(), WidgetType.QUIZ);
         widgetRepository.save(widget);
 
-        QuizTitle quizTitle = new QuizTitle(request.title());
-        QuizWidget quizWidget = new QuizWidget(widget.getId(), quizTitle);
+        QuizWidget quizWidget = new QuizWidget(widget.getId(), new QuizTitle(request.title()));
         quizWidgetRepository.save(quizWidget);
 
-        Long quizWidgetId = quizWidget.getId();
-        List<QuizOption> quizOptions = request.options().stream()
-                .map(option -> new QuizOption(quizWidgetId, option.content(), option.isCorrect()))
-                .toList();
-        quizOptionRepository.saveAll(quizOptions);
+        quizOptionRepository.saveAll(request.toQuizOptions(quizWidget.getId()));
 
-        return CreateQuizWidgetResponse.from(quizWidgetId);
+        return CreateQuizWidgetResponse.from(quizWidget.getId());
     }
 
-
-    @Transactional(readOnly = true)
     public GetQuizWidgetResponse readQuizWidget(User user, Long quizWidgetId) {
-        QuizWidget quizWidget = quizWidgetRepository.findById(quizWidgetId)
-                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
+        QuizWidget quizWidget = findQuizWidgetOrThrow(quizWidgetId);
+        Widget widget = findWidgetOrThrow(quizWidget.getWidgetId());
 
-        Widget widget = widgetRepository.findById(quizWidget.getWidgetId())
-                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
+        validateAccess(user.getId(), widget.getLessonId());
 
-        Long lessonId = widget.getLessonId();
-        boolean isTeacher = isTeacherOfLesson(user.getId(), lessonId);
-        boolean isStudent = isStudentOfLesson(user.getId(), lessonId);
-
-        if (!isTeacher && !isStudent) {
-            throw QuizWidgetApplicationException.forbidden();
-        }
-
-        List<QuizOption> quizOptions = quizOptionRepository.findAllByQuizWidgetId(quizWidgetId);
-
-        int correctRate = calculateCorrectRate(user, quizWidgetId);
-
-        List<Long> submittedOptionIds = List.of();
-        if (isStudent) {
-            Student student = studentRepository.findByLessonIdAndUserId(lessonId, user.getId())
-                    .orElseThrow(QuizWidgetApplicationException::forbidden);
-            submittedOptionIds = quizSubmissionRepository.findAllByStudentIdAndQuizWidgetId(student.getId(),
-                            quizWidgetId)
-                    .stream()
-                    .map(QuizSubmission::getQuizOptionId)
-                    .toList();
-        }
-
-        List<QuizSubmission> allSubmissions = quizSubmissionRepository.findAllByQuizWidgetId(quizWidgetId);
-        List<Long> studentIds = allSubmissions.stream()
-                .map(QuizSubmission::getStudentId)
-                .distinct()
-                .toList();
-        Students students = studentRepository.findAllByIdIn(studentIds);
-
-        QuizParticipationResponse participationResponse = QuizParticipationResponse.of(
-                quizOptions,
-                allSubmissions,
-                students
+        QuizSubmissions quizSubmissions = new QuizSubmissions(
+                quizOptionRepository.findAllByQuizWidgetId(quizWidgetId),
+                quizSubmissionRepository.findAllByQuizWidgetId(quizWidgetId)
         );
 
-        return GetQuizWidgetResponse.of(quizWidget, quizOptions, correctRate, submittedOptionIds,
-                participationResponse);
+        List<Long> studentSubmittedOptionIds = getStudentSubmittedOptionIds(
+                user,
+                widget.getLessonId(),
+                quizSubmissions
+        );
+
+        Students students = studentRepository.findAllByIdIn(quizSubmissions.getDistinctStudentIds());
+        QuizSubmissionSummaryResponse submissionSummary = QuizSubmissionSummaryResponse.of(quizSubmissions, students);
+
+        return GetQuizWidgetResponse.of(quizWidget, quizSubmissions, studentSubmittedOptionIds, submissionSummary);
     }
 
-    private int calculateCorrectRate(User user, Long quizWidgetId) {
-        Long totalSubmissions = quizSubmissionRepository.countByQuizWidgetId(quizWidgetId);
-        if (totalSubmissions == 0) {
-            return 0;
-        }
-
-        List<Long> correctOptionIds = readQuizAnswer(user, quizWidgetId).answerQuizOptionIds();
-
-        if (correctOptionIds.isEmpty()) {
-            return 0;
-        }
-
-        Long correctSubmissions = quizSubmissionRepository.countByQuizWidgetIdAndQuizOptionIdIn(quizWidgetId,
-                correctOptionIds);
-
-        double rawRate = (double) correctSubmissions / totalSubmissions * 100;
-        return (int) Math.round(rawRate);
+    private List<Long> getStudentSubmittedOptionIds(User user, Long lessonId, QuizSubmissions quizSubmissions) {
+        return studentRepository.findByLessonIdAndUserId(lessonId, user.getId())
+                .map(student -> quizSubmissions.getSubmittedOptionIdsByStudentId(student.getId()))
+                .orElse(List.of());
     }
 
     @Transactional
     public void updateQuizWidgetStatus(User user, Long quizWidgetId, UpdateQuizWidgetStatusRequest request) {
-        QuizWidget quizWidget = quizWidgetRepository.findById(quizWidgetId)
-                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
-        quizWidget.updateStatus(QuizStatus.fromDescription(request.status()));
-
-        Widget widget = widgetRepository.findById(quizWidget.getWidgetId())
-                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
+        QuizWidget quizWidget = findQuizWidgetOrThrow(quizWidgetId);
+        Widget widget = findWidgetOrThrow(quizWidget.getWidgetId());
 
         if (!isTeacherOfLesson(user.getId(), widget.getLessonId())) {
             throw QuizWidgetApplicationException.forbidden();
         }
 
-        quizWidgetRepository.save(quizWidget);
+        quizWidget.updateStatus(QuizStatus.fromDescription(request.status()));
     }
 
     @Transactional
     public void deleteQuizWidget(User user, Long quizWidgetId) {
-        QuizWidget quizWidget = quizWidgetRepository.findById(quizWidgetId)
-                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
-
-        Widget widget = widgetRepository.findById(quizWidget.getWidgetId())
-                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
+        QuizWidget quizWidget = findQuizWidgetOrThrow(quizWidgetId);
+        Widget widget = findWidgetOrThrow(quizWidget.getWidgetId());
 
         if (!isTeacherOfLesson(user.getId(), widget.getLessonId())) {
             throw QuizWidgetApplicationException.forbidden();
@@ -164,83 +114,74 @@ public class QuizWidgetService {
         quizSubmissionRepository.deleteAllByQuizWidgetId(quizWidgetId);
         quizOptionRepository.deleteAllByQuizWidgetId(quizWidgetId);
         quizWidgetRepository.deleteById(quizWidgetId);
+        widgetRepository.deleteById(widget.getId());
     }
 
     @Transactional
     public void submitQuizSubmission(User user, Long quizWidgetId, SubmitQuizSubmissionRequest request) {
-        QuizWidget quizWidget = quizWidgetRepository.findById(quizWidgetId)
-                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
+        QuizWidget quizWidget = findQuizWidgetOrThrow(quizWidgetId);
 
-        if (!quizWidget.getQuizStatus().equals(QuizStatus.IN_PROGRESS)) {
+        if (quizWidget.getQuizStatus() != QuizStatus.IN_PROGRESS) {
             throw QuizWidgetApplicationException.notInProgress();
         }
 
-        Widget widget = widgetRepository.findById(quizWidget.getWidgetId())
-                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
-
-        if (!isTeacherOfLesson(user.getId(), widget.getLessonId()) && !isStudentOfLesson(user.getId(),
-                widget.getLessonId())) {
-            throw QuizWidgetApplicationException.forbidden();
-        }
-
-        Student student = studentRepository.findByUserId(user.getId())
+        Widget widget = findWidgetOrThrow(quizWidget.getWidgetId());
+        Student student = studentRepository.findByLessonIdAndUserId(widget.getLessonId(), user.getId())
                 .orElseThrow(QuizWidgetApplicationException::forbidden);
 
         if (quizSubmissionRepository.existsByStudentIdAndQuizWidgetId(student.getId(), quizWidgetId)) {
             throw QuizWidgetApplicationException.alreadySubmitted();
         }
 
-        List<QuizSubmission> submissions = request.quizOptionIds().stream()
-                .map(optionId -> new QuizSubmission(student.getId(), quizWidgetId, optionId))
-                .toList();
-
-        quizSubmissionRepository.saveAll(submissions);
+        quizSubmissionRepository.saveAll(request.toQuizSubmissions(student.getId(), quizWidgetId));
     }
 
-    @Transactional(readOnly = true)
     public GetQuizAnswerResponse readQuizAnswer(User user, Long quizWidgetId) {
-        List<QuizOption> quizOptions = quizOptionRepository.findAllByQuizWidgetIdAndIsCorrectTrue(quizWidgetId);
+        QuizWidget quizWidget = findQuizWidgetOrThrow(quizWidgetId);
+        Widget widget = findWidgetOrThrow(quizWidget.getWidgetId());
 
-        QuizWidget quizWidget = quizWidgetRepository.findById(quizWidgetId)
-                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
+        validateAccess(user.getId(), widget.getLessonId());
 
-        Widget widget = widgetRepository.findById(quizWidget.getWidgetId())
-                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
+        QuizSubmissions quizSubmissions = new QuizSubmissions(
+                quizOptionRepository.findAllByQuizWidgetId(quizWidgetId),
+                List.of()
+        );
 
-        if (!isTeacherOfLesson(user.getId(), widget.getLessonId()) && !isStudentOfLesson(user.getId(),
-                widget.getLessonId())) {
-            throw QuizWidgetApplicationException.forbidden();
-        }
-
-        List<Long> correctOptionIds = quizOptions.stream()
-                .map(QuizOption::getId)
-                .toList();
-
-        return GetQuizAnswerResponse.from(correctOptionIds);
+        return GetQuizAnswerResponse.from(quizSubmissions.getCorrectOptionIds());
     }
 
     @Transactional
     public UpdateQuizOptionResponse updateQuizOption(User user, UpdateQuizOptionRequest request) {
         Long quizWidgetId = request.quizWidgetId();
 
-        if (quizSubmissionRepository.existsByQuizWidgetId(quizWidgetId)) {
-            throw QuizWidgetApplicationException.alreadyQuizSubmitted();
-        }
+        // 1. 검증
+        validateOptionUpdate(user, quizWidgetId);
+        List<QuizOption> existingOptions = quizOptionRepository.findAllByQuizWidgetId(quizWidgetId);
 
-        QuizWidget quizWidget = quizWidgetRepository.findById(quizWidgetId)
-                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
+        // 2. 삭제 처리 (요청에 없는 기존 옵션 제거)
+        deleteRemovedOptions(existingOptions, request.options());
 
-        Widget widget = widgetRepository.findById(quizWidget.getWidgetId())
-                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
+        // 3. 업데이트 및 새 옵션 추가
+        saveOrUpdateOptions(quizWidgetId, existingOptions, request.options());
+
+        return UpdateQuizOptionResponse.from(quizWidgetId);
+    }
+
+    private void validateOptionUpdate(User user, Long quizWidgetId) {
+        QuizWidget quizWidget = findQuizWidgetOrThrow(quizWidgetId);
+        Widget widget = findWidgetOrThrow(quizWidget.getWidgetId());
 
         if (!isTeacherOfLesson(user.getId(), widget.getLessonId())) {
             throw QuizWidgetApplicationException.forbidden();
         }
 
-        List<QuizOption> existingOptions = quizOptionRepository.findAllByQuizWidgetId(quizWidgetId);
+        if (quizSubmissionRepository.existsByQuizWidgetId(quizWidgetId)) {
+            throw QuizWidgetApplicationException.alreadyQuizSubmitted();
+        }
+    }
 
-        // 삭제 처리
-        List<Long> requestOptionIds = request.options().stream()
+    private void deleteRemovedOptions(List<QuizOption> existingOptions, List<QuizOptionRequest> requests) {
+        List<Long> requestOptionIds = requests.stream()
                 .map(QuizOptionRequest::quizOptionId)
                 .filter(Objects::nonNull)
                 .toList();
@@ -248,25 +189,51 @@ public class QuizWidgetService {
         List<QuizOption> toDelete = existingOptions.stream()
                 .filter(option -> !requestOptionIds.contains(option.getId()))
                 .toList();
-        quizOptionRepository.deleteAllInBatch(toDelete);
 
-        // 업데이트 또는 생성 처리
-        for (QuizOptionRequest optionRequest : request.options()) {
+        if (!toDelete.isEmpty()) {
+            quizOptionRepository.deleteAllInBatch(toDelete);
+        }
+    }
+
+    private void saveOrUpdateOptions(
+            Long quizWidgetId,
+            List<QuizOption> existingOptions,
+            List<QuizOptionRequest> requests
+    ) {
+        for (QuizOptionRequest optionRequest : requests) {
             if (optionRequest.quizOptionId() != null) {
-                QuizOption existingOption = existingOptions.stream()
-                        .filter(option -> option.getId().equals(optionRequest.quizOptionId()))
-                        .findFirst()
-                        .orElseThrow(QuizWidgetApplicationException::quizOptionNotFound);
-
-                existingOption.update(optionRequest.content(), optionRequest.isCorrect());
-                quizOptionRepository.save(existingOption);
+                updateExistingOption(existingOptions, optionRequest);
             } else {
-                QuizOption newOption = new QuizOption(quizWidgetId, optionRequest.content(), optionRequest.isCorrect());
-                quizOptionRepository.save(newOption);
+                quizOptionRepository.save(
+                        new QuizOption(quizWidgetId, optionRequest.content(), optionRequest.isCorrect())
+                );
             }
         }
+    }
 
-        return UpdateQuizOptionResponse.from(quizWidgetId);
+    private void updateExistingOption(List<QuizOption> existingOptions, QuizOptionRequest optionRequest) {
+        QuizOption existingOption = existingOptions.stream()
+                .filter(option -> option.getId().equals(optionRequest.quizOptionId()))
+                .findFirst()
+                .orElseThrow(QuizWidgetApplicationException::quizOptionNotFound);
+
+        existingOption.update(optionRequest.content(), optionRequest.isCorrect());
+    }
+
+    private QuizWidget findQuizWidgetOrThrow(Long quizWidgetId) {
+        return quizWidgetRepository.findById(quizWidgetId)
+                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
+    }
+
+    private Widget findWidgetOrThrow(Long widgetId) {
+        return widgetRepository.findById(widgetId)
+                .orElseThrow(QuizWidgetApplicationException::quizWidgetNotFound);
+    }
+
+    private void validateAccess(Long userId, Long lessonId) {
+        if (!isTeacherOfLesson(userId, lessonId) && !isStudentOfLesson(userId, lessonId)) {
+            throw QuizWidgetApplicationException.forbidden();
+        }
     }
 
     private boolean isTeacherOfLesson(Long userId, Long lessonId) {
