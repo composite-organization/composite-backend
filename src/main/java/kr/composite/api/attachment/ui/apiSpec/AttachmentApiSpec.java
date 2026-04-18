@@ -10,6 +10,8 @@ import java.util.List;
 import kr.composite.api.attachment.ui.dto.response.GetAttachmentMetaDataResponse;
 import kr.composite.api.attachment.ui.dto.response.GetAttachmentResponse;
 import kr.composite.api.attachment.ui.dto.response.PostAttachmentResponse;
+import kr.composite.api.user.domain.User;
+import kr.composite.api.user.ui.requestuser.RequestUser;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +23,7 @@ public interface AttachmentApiSpec {
 
     @Operation(summary = "수업자료 상세 조회", description = "특정 수업자료의 상세 정보(다운로드 URL 등)를 조회합니다.")
     ResponseEntity<GetAttachmentResponse> readAttachment(
+            @Parameter(hidden = true) @RequestUser User user,
             @Parameter(description = "수업자료 위젯 ID", example = "1")
             @PathVariable("attachmentWidgetId") Long attachmentWidgetId,
             @Parameter(description = "수업자료 ID", example = "1")
@@ -29,6 +32,7 @@ public interface AttachmentApiSpec {
 
     @Operation(summary = "수업자료 목록 조회", description = "위젯에 속한 모든 수업자료의 메타데이터 목록을 조회합니다.")
     ResponseEntity<List<GetAttachmentMetaDataResponse>> readAttachmentMetaData(
+            @Parameter(hidden = true) @RequestUser User user,
             @Parameter(description = "수업자료 위젯 ID", example = "1")
             @PathVariable("attachmentWidgetId") Long attachmentWidgetId
     );
@@ -51,6 +55,7 @@ public interface AttachmentApiSpec {
             )
     )
     ResponseEntity<PostAttachmentResponse> createAttachment(
+            @Parameter(hidden = true) @RequestUser User user,
             @Parameter(description = "수업자료 위젯 ID", example = "1")
             @PathVariable("attachmentWidgetId") Long attachmentWidgetId,
             @RequestPart("attachment") MultipartFile attachment
@@ -58,6 +63,7 @@ public interface AttachmentApiSpec {
 
     @Operation(summary = "수업자료 삭제", description = "특정 수업자료을 S3와 DB에서 삭제합니다.")
     ResponseEntity<Void> deleteAttachment(
+            @Parameter(hidden = true) @RequestUser User user,
             @Parameter(description = "수업자료 위젯 ID", example = "1")
             @PathVariable("attachmentWidgetId") Long attachmentWidgetId,
             @Parameter(description = "수업자료 ID", example = "1")
