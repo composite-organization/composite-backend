@@ -3,8 +3,10 @@ package kr.composite.api.quiz.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class QuizTitle {
@@ -22,10 +24,10 @@ public class QuizTitle {
 
     private void validateValue(String value) {
         if (value == null) {
-            throw QuizDomainException.emptyTitle();
+            throw QuizWidgetDomainException.emptyTitle();
         }
         if (value.length() < MIN_LENGTH || value.length() > MAX_LENGTH) {
-            throw QuizDomainException.invalidTitleLength(value, MIN_LENGTH, MAX_LENGTH);
+            throw QuizWidgetDomainException.invalidTitleLength(value, MIN_LENGTH, MAX_LENGTH);
         }
     }
 }

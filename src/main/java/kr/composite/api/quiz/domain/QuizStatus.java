@@ -1,8 +1,7 @@
 package kr.composite.api.quiz.domain;
 
-import lombok.Getter;
-
 import java.util.Arrays;
+import lombok.Getter;
 
 @Getter
 public enum QuizStatus {
@@ -21,6 +20,6 @@ public enum QuizStatus {
         return Arrays.stream(values())
                 .filter(value -> value.description.equals(description))
                 .findFirst()
-                .orElseThrow(() -> QuizDomainException.unsupportedStatus(description));
+                .orElseThrow(() -> QuizWidgetDomainException.unsupportedStatus(description));
     }
 }
