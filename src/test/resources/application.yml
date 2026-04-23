@@ -54,3 +54,6 @@ external:
           name: name
         key:
           prefix: prefix
+
+cors:
+  allowed-hosts: http://localhost:5173

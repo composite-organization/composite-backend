@@ -46,3 +46,6 @@ external:
           name: ${AWS_S3_ATTACHMENT_BUCKET_NAME}
         key:
           prefix: ${AWS_S3_ATTACHMENT_KEY_PREFIX}
+
+cors:
+  allowed-hosts: ${CORS_ALLOWED_HOSTS}
