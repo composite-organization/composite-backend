@@ -10,6 +10,8 @@ import kr.composite.api.attachment.ui.dto.request.FileUploadRequest;
 import kr.composite.api.attachment.ui.dto.response.GetAttachmentMetaDataResponse;
 import kr.composite.api.attachment.ui.dto.response.GetAttachmentResponse;
 import kr.composite.api.attachment.ui.dto.response.PostAttachmentResponse;
+import kr.composite.api.user.domain.User;
+import kr.composite.api.user.ui.requestuser.RequestUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,33 +30,39 @@ public class AttachmentController implements AttachmentApiSpec {
 
     private final AttachmentService attachmentService;
 
+    @Override
     @GetMapping("attachmentWidgets/{attachmentWidgetId}/attachments/{attachmentId}")
     public ResponseEntity<GetAttachmentResponse> readAttachment(
+            @RequestUser User user,
             @PathVariable("attachmentWidgetId") Long attachmentWidgetId,
             @PathVariable("attachmentId") Long attachmentId
     ) {
         AttachmentFindRequest attachmentFindRequest = AttachmentFindRequest.of(attachmentId, attachmentWidgetId);
         GetAttachmentResponse getAttachmentResponse = GetAttachmentResponse.from(
-                attachmentService.readAttachment(attachmentFindRequest));
+                attachmentService.getAttachment(user, attachmentFindRequest));
 
         return ResponseEntity.ok().body(getAttachmentResponse);
     }
 
+    @Override
     @GetMapping("attachmentWidgets/{attachmentWidgetId}/attachments")
     public ResponseEntity<List<GetAttachmentMetaDataResponse>> readAttachmentMetaData(
+            @RequestUser User user,
             @PathVariable("attachmentWidgetId") Long attachmentWidgetId
     ) {
         AttachmentWidgetFindRequest attachmentWidgetFindRequest = AttachmentWidgetFindRequest.from(attachmentWidgetId);
         List<GetAttachmentMetaDataResponse> getAttachmentMetaDataResponse =
-                attachmentService.readAttachmentMetaData(attachmentWidgetFindRequest).stream()
+                attachmentService.getAttachmentMetaData(user, attachmentWidgetFindRequest).stream()
                         .map(GetAttachmentMetaDataResponse::from)
                         .toList();
 
         return ResponseEntity.ok().body(getAttachmentMetaDataResponse);
     }
 
+    @Override
     @PostMapping(value = "attachmentWidgets/{attachmentWidgetId}/attachments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PostAttachmentResponse> createAttachment(
+            @RequestUser User user,
             @PathVariable("attachmentWidgetId") Long attachmentWidgetId,
             @RequestPart("attachment") MultipartFile attachment
     ) {
@@ -62,19 +70,21 @@ public class AttachmentController implements AttachmentApiSpec {
         FileUploadRequest fileUploadRequest = FileUploadRequest.from(attachment);
 
         PostAttachmentResponse postAttachmentResponse = PostAttachmentResponse.from(
-                attachmentService.addAttachment(attachmentWidgetFindRequest, fileUploadRequest));
+                attachmentService.addAttachment(user, attachmentWidgetFindRequest, fileUploadRequest));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(postAttachmentResponse);
     }
 
+    @Override
     @DeleteMapping("attachmentWidgets/{attachmentWidgetId}/attachments/{attachmentId}")
     public ResponseEntity<Void> deleteAttachment(
+            @RequestUser User user,
             @PathVariable("attachmentWidgetId") Long attachmentWidgetId,
             @PathVariable("attachmentId") Long attachmentId
     ) {
         AttachmentDeleteRequest attachmentDeleteRequest =
                 AttachmentDeleteRequest.of(attachmentId, attachmentWidgetId);
-        attachmentService.deleteAttachment(attachmentDeleteRequest);
+        attachmentService.deleteAttachment(user, attachmentDeleteRequest);
 
         return ResponseEntity.noContent().build();
     }

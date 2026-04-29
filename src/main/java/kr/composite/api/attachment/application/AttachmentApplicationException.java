@@ -47,6 +47,14 @@ class AttachmentApplicationException extends BusinessException {
         );
     }
 
+    public static AttachmentApplicationException forbidden() {
+        return new AttachmentApplicationException(
+                generateCode(5),
+                "해당 작업에 대한 권한이 없습니다.",
+                Category.FORBIDDEN
+        );
+    }
+
     private static String generateCode(int number) {
         return CODE_PREFIX + String.format("%03d", number);
     }

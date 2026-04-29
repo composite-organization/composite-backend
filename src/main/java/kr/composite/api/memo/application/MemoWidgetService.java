@@ -8,6 +8,9 @@ import kr.composite.api.memo.domain.MemoContent;
 import kr.composite.api.memo.domain.MemoTitle;
 import kr.composite.api.memo.domain.MemoWidget;
 import kr.composite.api.memo.domain.MemoWidgetRepository;
+import kr.composite.api.student.domain.StudentRepository;
+import kr.composite.api.teacher.domain.TeacherRepository;
+import kr.composite.api.user.domain.User;
 import kr.composite.api.widget.domain.Widget;
 import kr.composite.api.widget.domain.WidgetRepository;
 import kr.composite.api.widget.domain.WidgetType;
@@ -21,11 +24,18 @@ public class MemoWidgetService {
 
     private final MemoWidgetRepository memoWidgetRepository;
     private final WidgetRepository widgetRepository;
+    private final TeacherRepository teacherRepository;
+    private final StudentRepository studentRepository;
 
     @Transactional(readOnly = true)
-    public MemoWidgetResponse getMemoWidget(MemoWidgetFindRequest request) {
+    public MemoWidgetResponse getMemoWidget(User user, MemoWidgetFindRequest request) {
         MemoWidget memoWidget = memoWidgetRepository.findById(request.id())
                 .orElseThrow(MemoApplicationException::widgetNotFound);
+
+        Widget widget = widgetRepository.findById(memoWidget.getWidgetId())
+                .orElseThrow(MemoApplicationException::widgetNotFound);
+
+        validateParticipant(widget.getLessonId(), user.getId());
 
         MemoWidgetResponse memoWidgetResponse = MemoWidgetResponse.from(memoWidget);
 
@@ -33,7 +43,9 @@ public class MemoWidgetService {
     }
 
     @Transactional
-    public MemoWidgetResponse addMemoWidget(MemoWidgetAddRequest request) {
+    public MemoWidgetResponse addMemoWidget(User user, MemoWidgetAddRequest request) {
+        validateTeacher(request.lessonId(), user.getId());
+
         Widget widget = new Widget(request.lessonId(), WidgetType.MEMO);
         widgetRepository.save(widget);
 
@@ -46,9 +58,14 @@ public class MemoWidgetService {
     }
 
     @Transactional
-    public MemoWidgetResponse updateMemoWidget(MemoWidgetUpdateRequest request) {
+    public MemoWidgetResponse updateMemoWidget(User user, MemoWidgetUpdateRequest request) {
         MemoWidget memoWidget = memoWidgetRepository.findById(request.memoWidgetId())
                 .orElseThrow(MemoApplicationException::widgetNotFound);
+
+        Widget widget = widgetRepository.findById(memoWidget.getWidgetId())
+                .orElseThrow(MemoApplicationException::widgetNotFound);
+
+        validateTeacher(widget.getLessonId(), user.getId());
 
         memoWidget.update(request.title(), request.content());
 
@@ -58,13 +75,31 @@ public class MemoWidgetService {
     }
 
     @Transactional
-    public void deleteMemoWidget(MemoWidgetFindRequest request) {
-        MemoWidget memoWidget = memoWidgetRepository.findById(request.id()).orElse(null);
-        if (memoWidget == null) {
-            return;
-        }
+    public void deleteMemoWidget(User user, MemoWidgetFindRequest request) {
+        MemoWidget memoWidget = memoWidgetRepository.findById(request.id())
+                .orElseThrow(MemoApplicationException::widgetNotFound);
+
+        Widget widget = widgetRepository.findById(memoWidget.getWidgetId())
+                .orElseThrow(MemoApplicationException::widgetNotFound);
+
+        validateTeacher(widget.getLessonId(), user.getId());
 
         memoWidgetRepository.deleteById(request.id());
         widgetRepository.deleteById(memoWidget.getWidgetId());
+    }
+
+    private void validateTeacher(Long lessonId, Long userId) {
+        if (!teacherRepository.existsByLessonIdAndUserId(lessonId, userId)) {
+            throw MemoApplicationException.forbidden();
+        }
+    }
+
+    private void validateParticipant(Long lessonId, Long userId) {
+        boolean isTeacher = teacherRepository.existsByLessonIdAndUserId(lessonId, userId);
+        boolean isStudent = studentRepository.existsByLessonIdAndUserId(lessonId, userId);
+
+        if (!isTeacher && !isStudent) {
+            throw MemoApplicationException.forbidden();
+        }
     }
 }

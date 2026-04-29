@@ -18,6 +18,14 @@ class MemoApplicationException extends BusinessException {
         );
     }
 
+    public static MemoApplicationException forbidden() {
+        return new MemoApplicationException(
+                generateCode(2),
+                "해당 작업에 대한 권한이 없습니다.",
+                Category.FORBIDDEN
+        );
+    }
+
     private static String generateCode(int number) {
         return CODE_PREFIX + String.format("%03d", number);
     }
