@@ -32,6 +32,9 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
         globally_quoted_identifiers: true
 
+server:
+  forward-headers-strategy: framework
+
 authentication:
   jwt:
     expiration: ${JWT_EXPIRATION}
