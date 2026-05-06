@@ -1,5 +1,6 @@
 package kr.composite.api.attachment.infrastructure;
 
+import java.util.List;
 import java.util.Optional;
 import kr.composite.api.attachment.domain.AttachmentWidget;
 import kr.composite.api.attachment.domain.AttachmentWidgetRepository;
@@ -15,6 +16,11 @@ public class JpaAttachmentWidgetRepository implements AttachmentWidgetRepository
     @Override
     public Optional<AttachmentWidget> findById(Long id) {
         return springJpaAttachmentWidgetRepository.findById(id);
+    }
+
+    @Override
+    public List<AttachmentWidget> findAllByWidgetIdIn(List<Long> widgetIds) {
+        return springJpaAttachmentWidgetRepository.findAllByWidgetIdIn(widgetIds);
     }
 
     @Override
