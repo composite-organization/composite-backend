@@ -8,5 +8,7 @@ public interface VoteWidgetRepository {
 
     Optional<VoteWidget> findById(Long voteWidgetId);
 
+    Optional<VoteWidget> findByWidgetId(Long widgetId);
+
     void deleteById(Long voteWidgetId);
 }

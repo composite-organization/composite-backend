@@ -8,6 +8,7 @@ import kr.composite.api.lesson.ui.dto.request.FindMyLessonRequest;
 import kr.composite.api.lesson.ui.dto.request.JoinLessonRequest;
 import kr.composite.api.lesson.ui.dto.response.CreateLessonResponse;
 import kr.composite.api.lesson.ui.dto.response.GetLessonResponse;
+import kr.composite.api.lesson.ui.dto.response.GetWidgetIdsResponse;
 import kr.composite.api.user.domain.User;
 import kr.composite.api.user.ui.CredentialTranslator;
 import kr.composite.api.user.ui.requestuser.RequestUser;
@@ -71,5 +72,16 @@ public class LessonController implements LessonApiSpec {
         GetLessonResponse getLessonResponse = lessonService.readLesson(lessonCode, user);
 
         return ResponseEntity.ok().body(getLessonResponse);
+    }
+
+    @Override
+    @GetMapping("/lessons/{lessonCode}/widgets")
+    public ResponseEntity<GetWidgetIdsResponse> getWidgetIds(
+            @PathVariable("lessonCode") String lessonCode,
+            @RequestUser User user
+    ) {
+        GetWidgetIdsResponse response = lessonService.readWidgetIds(lessonCode, user);
+
+        return ResponseEntity.ok().body(response);
     }
 }

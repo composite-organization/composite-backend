@@ -8,5 +8,7 @@ public interface QuizWidgetRepository {
 
     Optional<QuizWidget> findById(Long quizWidgetId);
 
+    Optional<QuizWidget> findByWidgetId(Long widgetId);
+
     void deleteById(Long quizWidgetId);
 }

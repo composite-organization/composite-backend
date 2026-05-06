@@ -23,6 +23,11 @@ public class JpaQuizWidgetRepository implements QuizWidgetRepository {
     }
 
     @Override
+    public Optional<QuizWidget> findByWidgetId(Long widgetId) {
+        return springDataJpaQuizWidgetRepository.findByWidgetId(widgetId);
+    }
+
+    @Override
     public void deleteById(Long quizWidgetId) {
         springDataJpaQuizWidgetRepository.deleteById(quizWidgetId);
     }

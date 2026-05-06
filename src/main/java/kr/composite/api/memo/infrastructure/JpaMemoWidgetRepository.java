@@ -18,6 +18,11 @@ public class JpaMemoWidgetRepository implements MemoWidgetRepository {
     }
 
     @Override
+    public Optional<MemoWidget> findByWidgetId(Long widgetId) {
+        return springDataJpaMemoWidgetRepository.findByWidgetId(widgetId);
+    }
+
+    @Override
     public void save(MemoWidget memoWidget) {
         springDataJpaMemoWidgetRepository.save(memoWidget);
     }

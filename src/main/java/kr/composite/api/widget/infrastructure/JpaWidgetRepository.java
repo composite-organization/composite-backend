@@ -1,5 +1,6 @@
 package kr.composite.api.widget.infrastructure;
 
+import java.util.List;
 import java.util.Optional;
 import kr.composite.api.widget.domain.Widget;
 import kr.composite.api.widget.domain.WidgetRepository;
@@ -25,5 +26,10 @@ public class JpaWidgetRepository implements WidgetRepository {
     @Override
     public Optional<Widget> findById(Long id) {
         return springDataJpaWidgetRepository.findById(id);
+    }
+
+    @Override
+    public List<Widget> findAllByLessonId(Long lessonId) {
+        return springDataJpaWidgetRepository.findAllByLessonId(lessonId);
     }
 }

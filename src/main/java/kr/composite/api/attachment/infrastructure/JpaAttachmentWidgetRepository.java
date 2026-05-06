@@ -18,6 +18,11 @@ public class JpaAttachmentWidgetRepository implements AttachmentWidgetRepository
     }
 
     @Override
+    public Optional<AttachmentWidget> findByWidgetId(Long widgetId) {
+        return springJpaAttachmentWidgetRepository.findByWidgetId(widgetId);
+    }
+
+    @Override
     public AttachmentWidget save(AttachmentWidget attachmentWidget) {
         return springJpaAttachmentWidgetRepository.save(attachmentWidget);
     }

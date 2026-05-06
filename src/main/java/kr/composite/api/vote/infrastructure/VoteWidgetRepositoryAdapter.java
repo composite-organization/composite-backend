@@ -23,6 +23,11 @@ public class VoteWidgetRepositoryAdapter implements VoteWidgetRepository {
     }
 
     @Override
+    public Optional<VoteWidget> findByWidgetId(Long widgetId) {
+        return jpaVoteWidgetRepository.findByWidgetId(widgetId);
+    }
+
+    @Override
     public void deleteById(Long voteWidgetId) {
         jpaVoteWidgetRepository.deleteById(voteWidgetId);
     }
