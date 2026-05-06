@@ -1,5 +1,6 @@
 package kr.composite.api.memo.infrastructure;
 
+import java.util.List;
 import java.util.Optional;
 import kr.composite.api.memo.domain.MemoWidget;
 import kr.composite.api.memo.domain.MemoWidgetRepository;
@@ -18,8 +19,8 @@ public class JpaMemoWidgetRepository implements MemoWidgetRepository {
     }
 
     @Override
-    public Optional<MemoWidget> findByWidgetId(Long widgetId) {
-        return springDataJpaMemoWidgetRepository.findByWidgetId(widgetId);
+    public List<MemoWidget> findAllByWidgetIdIn(List<Long> widgetIds) {
+        return springDataJpaMemoWidgetRepository.findAllByWidgetIdIn(widgetIds);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package kr.composite.api.quiz.infrastructure;
 
+import java.util.List;
 import java.util.Optional;
 import kr.composite.api.quiz.domain.QuizWidget;
 import kr.composite.api.quiz.domain.QuizWidgetRepository;
@@ -23,8 +24,8 @@ public class JpaQuizWidgetRepository implements QuizWidgetRepository {
     }
 
     @Override
-    public Optional<QuizWidget> findByWidgetId(Long widgetId) {
-        return springDataJpaQuizWidgetRepository.findByWidgetId(widgetId);
+    public List<QuizWidget> findAllByWidgetIdIn(List<Long> widgetIds) {
+        return springDataJpaQuizWidgetRepository.findAllByWidgetIdIn(widgetIds);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package kr.composite.api.vote.domain;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface VoteWidgetRepository {
@@ -8,7 +9,7 @@ public interface VoteWidgetRepository {
 
     Optional<VoteWidget> findById(Long voteWidgetId);
 
-    Optional<VoteWidget> findByWidgetId(Long widgetId);
+    List<VoteWidget> findAllByWidgetIdIn(List<Long> widgetIds);
 
     void deleteById(Long voteWidgetId);
 }

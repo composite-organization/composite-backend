@@ -1,5 +1,6 @@
 package kr.composite.api.lesson.application;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -35,6 +36,7 @@ import kr.composite.api.vote.domain.VoteWidget;
 import kr.composite.api.vote.domain.VoteWidgetRepository;
 import kr.composite.api.widget.domain.Widget;
 import kr.composite.api.widget.domain.WidgetRepository;
+import kr.composite.api.widget.domain.WidgetType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -131,29 +133,42 @@ public class LessonService {
 
     @Transactional(readOnly = true)
     public GetWidgetIdsResponse readWidgetIds(String lessonCodeValue, User user) {
-        LessonCode lessonCode = new LessonCode(lessonCodeValue);
-        Lesson lesson = lessonRepository.findByLessonCode(lessonCode)
-                .orElseThrow(() -> LessonApplicationException.cannotFindLesson());
+        Lesson lesson = lessonRepository.findByLessonCode(new LessonCode(lessonCodeValue))
+                .orElseThrow(LessonApplicationException::cannotFindLesson);
         Long lessonId = lesson.getId();
 
         validateParticipant(lessonId, user.getId());
 
-        Map<String, List<Long>> specificWidgetIdsGroupedByType = widgetRepository.findAllByLessonId(lessonId).stream()
-                .collect(Collectors.groupingBy(
-                        widget -> widget.getWidgetType().name().toLowerCase(),
-                        Collectors.mapping(this::getSpecificWidgetId, Collectors.filtering(Optional::isPresent, Collectors.mapping(Optional::get, Collectors.toList())))
-                ));
+        List<Widget> widgets = widgetRepository.findAllByLessonId(lessonId);
+        Map<WidgetType, List<Long>> widgetIdsByType = groupWidgetIdsByType(widgets);
 
-        return GetWidgetIdsResponse.from(specificWidgetIdsGroupedByType);
+        Map<String, List<Long>> specificWidgetIds = fetchSpecificWidgetIds(widgetIdsByType);
+
+        return GetWidgetIdsResponse.from(specificWidgetIds);
     }
 
-    private Optional<Long> getSpecificWidgetId(Widget widget) {
-        return switch (widget.getWidgetType()) {
-            case MEMO -> memoWidgetRepository.findByWidgetId(widget.getId()).map(MemoWidget::getId);
-            case ATTACHMENT -> attachmentWidgetRepository.findByWidgetId(widget.getId()).map(AttachmentWidget::getId);
-            case QUIZ -> quizWidgetRepository.findByWidgetId(widget.getId()).map(QuizWidget::getId);
-            case VOTE -> voteWidgetRepository.findByWidgetId(widget.getId()).map(VoteWidget::getId);
-        };
+    private Map<WidgetType, List<Long>> groupWidgetIdsByType(List<Widget> widgets) {
+        return widgets.stream()
+                .collect(Collectors.groupingBy(
+                        Widget::getWidgetType,
+                        Collectors.mapping(Widget::getId, Collectors.toList())
+                ));
+    }
+
+    private Map<String, List<Long>> fetchSpecificWidgetIds(Map<WidgetType, List<Long>> widgetIdsByType) {
+        Map<String, List<Long>> result = new HashMap<>();
+
+        widgetIdsByType.forEach((type, ids) -> {
+            List<Long> specificIds = switch (type) {
+                case MEMO -> memoWidgetRepository.findAllByWidgetIdIn(ids).stream().map(MemoWidget::getId).toList();
+                case ATTACHMENT -> attachmentWidgetRepository.findAllByWidgetIdIn(ids).stream().map(AttachmentWidget::getId).toList();
+                case QUIZ -> quizWidgetRepository.findAllByWidgetIdIn(ids).stream().map(QuizWidget::getId).toList();
+                case VOTE -> voteWidgetRepository.findAllByWidgetIdIn(ids).stream().map(VoteWidget::getId).toList();
+            };
+            result.put(type.name().toLowerCase(), specificIds);
+        });
+
+        return result;
     }
 
     private void validateParticipant(Long lessonId, Long userId) {

@@ -1,5 +1,6 @@
 package kr.composite.api.quiz.domain;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface QuizWidgetRepository {
@@ -8,7 +9,7 @@ public interface QuizWidgetRepository {
 
     Optional<QuizWidget> findById(Long quizWidgetId);
 
-    Optional<QuizWidget> findByWidgetId(Long widgetId);
+    List<QuizWidget> findAllByWidgetIdIn(List<Long> widgetIds);
 
     void deleteById(Long quizWidgetId);
 }
