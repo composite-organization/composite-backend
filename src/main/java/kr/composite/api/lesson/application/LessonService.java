@@ -109,7 +109,7 @@ public class LessonService {
         Teacher teacher = teacherRepository.findByLessonId(lesson.getId())
                 .orElseThrow(() -> LessonApplicationException.cannotFindTeacher());
 
-        CredentialPayload payload = new CredentialPayload(teacher.getLessonId());
+        CredentialPayload payload = new CredentialPayload(teacher.getUserId());
 
         return credentialCodec.encode(payload);
     }
