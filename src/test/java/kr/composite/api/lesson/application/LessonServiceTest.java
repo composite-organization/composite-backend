@@ -1,7 +1,6 @@
 package kr.composite.api.lesson.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
@@ -84,22 +83,25 @@ class LessonServiceTest {
         final String lessonCode = "CODE123";
         CreateLessonResponse lessonResponse = lessonService.createLesson(savedUser, new CreateLessonRequest("수업자", "테스트수업", lessonCode, "pass123"));
         final Long lessonId = lessonResponse.lessonId();
-        
+
         final String studentName = "참여자이름";
         final JoinLessonRequest request = new JoinLessonRequest(studentName);
         final User studentUser = userRepository.save(new User(new UserName("학생유저")));
 
         // when
-        lessonService.joinStudent(lessonCode, studentUser, request);
+        Long returnedLessonId = lessonService.joinStudent(lessonCode, studentUser, request);
 
         // then
-        // 1. Student가 올바르게 저장되었는지 확인
+        // 1. joinStudent가 lessonId를 반환하는지 확인
+        assertThat(returnedLessonId).isEqualTo(lessonId);
+
+        // 2. Student가 올바르게 저장되었는지 확인
         Student student = studentRepository.findByLessonIdAndUserId(lessonId, studentUser.getId()).orElseThrow();
         assertThat(student.getName().getValue()).isEqualTo(studentName);
         assertThat(student.getUserId()).isEqualTo(studentUser.getId());
         assertThat(student.getLessonId()).isEqualTo(lessonId);
 
-        // 2. 이벤트가 발행되었는지 확인
+        // 3. 이벤트가 발행되었는지 확인
         assertThat(testEventListener.getEvents()).hasSize(1);
         StudentParticipateEvent event = testEventListener.getEvents().get(0);
         assertThat(event.lessonId()).isEqualTo(lessonId);
@@ -111,7 +113,7 @@ class LessonServiceTest {
         // given
         final String lessonCode = "CODE123";
         lessonService.createLesson(savedUser, new CreateLessonRequest("수업자", "테스트수업", lessonCode, "pass123"));
-        
+
         final User studentUser = userRepository.save(new User(new UserName("학생유저")));
         lessonService.joinStudent(lessonCode, studentUser, new JoinLessonRequest("첫번째참여"));
 
@@ -128,7 +130,7 @@ class LessonServiceTest {
         final String lessonCode = "CODE123";
         CreateLessonResponse lessonResponse = lessonService.createLesson(savedUser, new CreateLessonRequest("수업자", "테스트수업", lessonCode, "pass123"));
         final Long lessonId = lessonResponse.lessonId();
-        
+
         final JoinLessonRequest request = new JoinLessonRequest(null); // 이름 없음
         final User studentUser = userRepository.save(new User(new UserName("학생유저")));
 
@@ -166,21 +168,25 @@ class LessonServiceTest {
         // given
         final String findLessonCode = "FIND123";
         final String password = "password123";
-        lessonService.createLesson(savedUser, new CreateLessonRequest("수업자", "조회수업", findLessonCode, password));
+        CreateLessonResponse createdLesson = lessonService.createLesson(savedUser, new CreateLessonRequest("수업자", "조회수업", findLessonCode, password));
         final FindMyLessonRequest request = new FindMyLessonRequest(findLessonCode, password);
 
-        // when & then
-        assertThatCode(() -> lessonService.readMyLesson(request)).doesNotThrowAnyException();
+        // when
+        AuthenticateLessonResult result = lessonService.readMyLesson(request);
+
+        // then
+        assertThat(result.lessonId()).isEqualTo(createdLesson.lessonId());
+        assertThat(result.token()).isNotBlank();
     }
 
     @Test
     void 수업을_정상적으로_조회한다() {
         // given
         final String lessonCode = "CODE123";
-        lessonService.createLesson(savedUser, new CreateLessonRequest("수업자", "테스트수업", lessonCode, "pass123"));
+        CreateLessonResponse createdLesson = lessonService.createLesson(savedUser, new CreateLessonRequest("수업자", "테스트수업", lessonCode, "pass123"));
 
         // when
-        var lessonResponse = lessonService.readLesson(lessonCode, savedUser);
+        var lessonResponse = lessonService.readLesson(createdLesson.lessonId(), savedUser);
 
         // then
         assertThat(lessonResponse.lessonName()).isEqualTo("테스트수업");
@@ -190,12 +196,12 @@ class LessonServiceTest {
     void 권한이_없는_수업_조회_시_예외가_발생한다() {
         // given
         final String lessonCode = "CODE123";
-        lessonService.createLesson(savedUser, new CreateLessonRequest("수업자", "테스트수업", lessonCode, "pass123"));
-        
+        CreateLessonResponse createdLesson = lessonService.createLesson(savedUser, new CreateLessonRequest("수업자", "테스트수업", lessonCode, "pass123"));
+
         User anotherUser = userRepository.save(new User(new UserName("다른유저")));
 
         // when & then
-        assertThatThrownBy(() -> lessonService.readLesson(lessonCode, anotherUser))
+        assertThatThrownBy(() -> lessonService.readLesson(createdLesson.lessonId(), anotherUser))
                 .isInstanceOf(LessonApplicationException.class)
                 .hasMessage("수업 접근 권한이 없습니다.");
     }
