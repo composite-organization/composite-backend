@@ -58,7 +58,7 @@ public class LessonService {
     private final CredentialCodec credentialCodec;
 
     @Transactional
-    public void joinStudent(String lessonCodeValue, User user, JoinLessonRequest request) {
+    public Long joinStudent(String lessonCodeValue, User user, JoinLessonRequest request) {
         LessonCode lessonCode = new LessonCode(lessonCodeValue);
         Lesson lesson = lessonRepository.findByLessonCode(lessonCode)
                 .orElseThrow(() -> LessonApplicationException.cannotFindLesson());
@@ -75,6 +75,8 @@ public class LessonService {
         Student savedStudent = studentRepository.save(studentToSave);
 
         eventPublisher.publishEvent(new StudentParticipateEvent(savedStudent, lessonId));
+
+        return lessonId;
     }
 
     @Transactional
@@ -98,7 +100,7 @@ public class LessonService {
     }
 
     @Transactional(readOnly = true)
-    public String readMyLesson(FindMyLessonRequest request) {
+    public AuthenticateLessonResult readMyLesson(FindMyLessonRequest request) {
         LessonCode lessonCode = new LessonCode(request.lessonCode());
         Lesson lesson = lessonRepository.findByLessonCode(lessonCode)
                 .orElseThrow(() -> LessonApplicationException.cannotFindLesson());
@@ -110,16 +112,15 @@ public class LessonService {
                 .orElseThrow(() -> LessonApplicationException.cannotFindTeacher());
 
         CredentialPayload payload = new CredentialPayload(teacher.getUserId());
+        String token = credentialCodec.encode(payload);
 
-        return credentialCodec.encode(payload);
+        return new AuthenticateLessonResult(token, lesson.getId());
     }
 
     @Transactional(readOnly = true)
-    public GetLessonResponse readLesson(String lessonCodeValue, User user) {
-        LessonCode lessonCode = new LessonCode(lessonCodeValue);
-        Lesson lesson = lessonRepository.findByLessonCode(lessonCode)
+    public GetLessonResponse readLesson(Long lessonId, User user) {
+        Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> LessonApplicationException.cannotFindLesson());
-        Long lessonId = lesson.getId();
 
         Teacher teacher = teacherRepository.findByLessonId(lessonId)
                 .orElseThrow(() -> LessonApplicationException.cannotFindTeacher());
@@ -132,10 +133,9 @@ public class LessonService {
     }
 
     @Transactional(readOnly = true)
-    public GetWidgetIdsResponse readWidgetIds(String lessonCodeValue, User user) {
-        Lesson lesson = lessonRepository.findByLessonCode(new LessonCode(lessonCodeValue))
+    public GetWidgetIdsResponse readWidgetIds(Long lessonId, User user) {
+        lessonRepository.findById(lessonId)
                 .orElseThrow(LessonApplicationException::cannotFindLesson);
-        Long lessonId = lesson.getId();
 
         validateParticipant(lessonId, user.getId());
 
