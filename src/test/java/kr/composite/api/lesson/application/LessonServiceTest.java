@@ -193,6 +193,25 @@ class LessonServiceTest {
     }
 
     @Test
+    void 수업에_참여한_학생도_수업을_조회할_수_있다() {
+        // given
+        final String lessonCode = "CODE123";
+        CreateLessonResponse createdLesson = lessonService.createLesson(
+                savedUser,
+                new CreateLessonRequest("수업자", "테스트수업", lessonCode, "pass123")
+        );
+
+        User studentUser = userRepository.save(new User(new UserName("학생유저")));
+        lessonService.joinStudent(lessonCode, studentUser, new JoinLessonRequest("참여학생"));
+
+        // when
+        var lessonResponse = lessonService.readLesson(createdLesson.lessonId(), studentUser);
+
+        // then
+        assertThat(lessonResponse.lessonName()).isEqualTo("테스트수업");
+    }
+
+    @Test
     void 권한이_없는_수업_조회_시_예외가_발생한다() {
         // given
         final String lessonCode = "CODE123";

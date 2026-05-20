@@ -125,9 +125,7 @@ public class LessonService {
         Teacher teacher = teacherRepository.findByLessonId(lessonId)
                 .orElseThrow(() -> LessonApplicationException.cannotFindTeacher());
 
-        if (!teacher.getUserId().equals(user.getId())) {
-            throw LessonApplicationException.noPermission();
-        }
+        validateParticipant(lessonId, user.getId());
 
         return GetLessonResponse.from(lesson.getName().getValue(), teacher.getName().getValue());
     }
