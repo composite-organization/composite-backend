@@ -147,7 +147,7 @@ public class AttachmentService {
 
         String uri = attachmentUriProvider.getUri(attachment);
 
-        return AttachmentUriResponse.from(uri);
+        return AttachmentUriResponse.from(uri, attachment.getAttachmentName().getValue());
     }
 
     @Transactional

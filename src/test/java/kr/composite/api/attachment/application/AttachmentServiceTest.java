@@ -191,7 +191,10 @@ class AttachmentServiceTest {
         AttachmentUriResponse response = attachmentService.getAttachment(user, request);
 
         // then
-        assertThat(response.presignedUrl()).isEqualTo(expectedUrl);
+        assertAll(
+                () -> assertThat(response.presignedUrl()).isEqualTo(expectedUrl),
+                () -> assertThat(response.fileName()).isEqualTo("report.pdf")
+        );
     }
 
     @Test
