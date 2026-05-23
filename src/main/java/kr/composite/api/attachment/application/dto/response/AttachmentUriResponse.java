@@ -1,10 +1,11 @@
 package kr.composite.api.attachment.application.dto.response;
 
 public record AttachmentUriResponse(
-        String presignedUrl
+        String presignedUrl,
+        String fileName
 ) {
 
-    public static AttachmentUriResponse from(String uri) {
-        return new AttachmentUriResponse(uri);
+    public static AttachmentUriResponse from(String uri, String fileName) {
+        return new AttachmentUriResponse(uri, fileName);
     }
 }
